@@ -3,9 +3,15 @@ using RangeHelpers
 using Test
 using Documenter
 
-Documenter.doctest(RangeHelpers)
-
 @testset "Explict" begin
+
+    @testset "no directions" begin
+        @test range(1, 2, length = 2) === 1.0:1.0:2.0
+        @test range(1, 2, step = 0.5) == [1, 1.5, 2]
+        @test range(1, stop = 2, step = 0.5) === 1.0:0.5:2.0
+        @test range(start=1, stop = 2, step = 0.5) === 1.0:0.5:2.0
+    end
+
     @testset "start" begin
         @test range(strictbelow(1), 3.1, step = 2) ≈ -0.9:2.0:3.1
         @test range(below(1), 3.1, step = 2) ≈ -0.9:2.0:3.1
@@ -84,3 +90,4 @@ for dir in instances(RangeHelpers.Direction)
     println("@test range($start, $stop, step=$step) === $r")
 end
 
+Documenter.doctest(RangeHelpers)
