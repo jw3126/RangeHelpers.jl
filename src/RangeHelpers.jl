@@ -1,6 +1,7 @@
 module RangeHelpers
 
 export strictbelow, below, around, above, strictabove
+export prolong
 
 # Use README as docstring
 @doc let path = joinpath(dirname(@__DIR__), "README.md")
@@ -8,7 +9,30 @@ export strictbelow, below, around, above, strictabove
     replace(read(path, String), "```julia" => "```jldoctest README")
 end RangeHelpers
 
+################################################################################
+##### range
+################################################################################
 @enum Direction strictbelow below around above strictabove
+
+(direction::Direction)(value) = Approach(value, direction)
+function direction_string(direction::Direction)
+    if direction === strictbelow
+        "strictbelow"
+    elseif direction === below
+        "below"
+    elseif direction === around
+        "around"
+    elseif direction === above
+        "above"
+    elseif direction === strictabove
+        "strictabove"
+    else
+        msg = """
+        Unreachable direction = $direction
+        """
+        error(msg)
+    end
+end
 
 struct Approach{V}
     value::V
@@ -18,27 +42,6 @@ end
 function Base.show(io::IO, o::Approach)
     direction = o.direction
     print(io, direction_string(direction), "(", o.value, ")")
-end
-
-(direction::Direction)(value) = Approach(value, direction)
-function Direction(s::Symbol)
-    if s === :strictabove
-        strictbelow
-    elseif s === :below
-        below
-    elseif s === :around
-        around
-    elseif s === :above
-        above
-    elseif s === :strictabove
-        strictabove
-    else
-        msg = """
-        Unknown direction $s
-        Possible directions are $(instances(Direction))
-        """
-        throw(ArgumentError(msg))
-    end
 end
 
 function opposite(direction::Direction)::Direction
@@ -185,4 +188,37 @@ function floatlength(start, stop, step)
     1 + (value(stop) - value(start)) / value(step)
 end
 
-end#moduel
+################################################################################
+##### prolong
+################################################################################
+function prolong(r::AbstractRange;start=nothing, stop=nothing, pre=nothing, post=nothing)
+    r1 = prolong_start(r, start)
+    r2 = prolong_stop(r1, stop)
+    r3 = prolong_pre(r2, pre)
+    r4 = prolong_post(r3, post)
+    return r4
+end
+
+prolong_start(r, start::Nothing) = r
+function prolong_start(r, start::Approach)
+    range(start, step=Base.step(r), stop=last(r))
+end
+
+prolong_stop(r, stop::Nothing) = r
+function prolong_stop(r, stop::Approach)
+    range(first(r), stop=stop, step=Base.step(r))
+end
+
+prolong_pre(r, pre::Nothing) = r
+function prolong_pre(r, pre::Integer)
+    len = length(r) + pre
+    range(stop=last(r), step=Base.step(r), length=len)
+end
+
+prolong_post(r, post::Nothing) = r
+function prolong_post(r, post)
+    len = length(r) + post
+    range(start=first(r), step=Base.step(r), length=len)
+end
+
+end #module

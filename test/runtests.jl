@@ -3,6 +3,44 @@ using RangeHelpers
 using Test
 using Documenter
 
+@testset "prolong" begin
+    @testset "pre post" begin
+        @inferred prolong(1:2, pre=1)
+        @inferred prolong(1:2, pre=-1)
+        @inferred prolong(1:2, post=2)
+        @inferred prolong(1:2, post=-1)
+
+        @test prolong(1:2, pre=1) == 0:2
+        @test_broken prolong(1:2, pre=1) === 0:2
+        @test prolong(1:2, pre=-1) == 2:2
+        @test_broken prolong(1:2, pre=-1) === 2:2
+        @test prolong(1:2, post=2) == 1:4
+        @test_broken prolong(1:2, post=2) === 1:4
+        @test prolong(1:2, post=-1) == 1:1
+        @test_broken prolong(1:2, post=-1) === 1:1
+        @test prolong(1:3, pre=1, post=-2) == 0:1
+        @test_broken prolong(1:3, pre=1, post=-2) === 0:1
+    end
+
+    @testset "start" begin
+        @inferred prolong(1:10, start=around(5))
+        @test prolong(1:10, start=around(5)) == 5:10
+        @test_broken prolong(1:10, start=around(5)) === 5:10
+
+        @test prolong(1:10, start=below(-2)) == -2:10
+        @test_broken prolong(1:10, start=below(-2)) === -2:10
+    end
+
+    @testset "stop" begin
+        @inferred prolong(1:10, stop=around(5))
+        @test prolong(1:10, stop=around(5)) == 1:5
+        @test prolong(1:10.0, stop=around(5)) === 1:5.0
+        @test_broken prolong(1:10, stop=around(5)) === 1:5
+
+    end
+
+end
+
 @testset "Explict" begin
 
     @testset "no directions" begin
