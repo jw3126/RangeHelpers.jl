@@ -34,4 +34,3 @@ julia> range(start=around(0.9), stop=3.0, step=1)
 julia> range(start=strictbelow(1.0), stop=3.0, step=1)
 0.0:1.0:3.0
 ```
-"""
