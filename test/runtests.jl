@@ -73,7 +73,6 @@ end
     @inferred range(strictbelow(1), 3.1, step = 2)
     @inferred range(1, above(3.1), step = 2)
     @inferred range(1, 3.1, step = around(2))
-
 end
 
 # useful for creating test cases

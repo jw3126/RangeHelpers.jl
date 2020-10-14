@@ -2,6 +2,12 @@ module RangeHelpers
 
 export strictbelow, below, around, above, strictabove
 
+# Use README as docstring
+@doc let path = joinpath(dirname(@__DIR__), "README.md")
+    include_dependency(path)
+    replace(read(path, String), "```julia" => "```jldoctest README")
+end RangeHelpers
+
 @enum Direction strictbelow below around above strictabove
 
 struct Approach{V}
@@ -101,7 +107,7 @@ end
 
 Construct a range from the arguments. Three arguments must be given.
 
-```jldoctest
+```jldoctest range
 julia> using RangeHelpers
 
 julia> using RangeHelpers: range
