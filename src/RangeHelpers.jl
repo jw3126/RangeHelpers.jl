@@ -1,8 +1,6 @@
 module RangeHelpers
 
-export Direction, strictbelow, below, around, above, strictabove
-
-export Approach
+export strictbelow, below, around, above, strictabove
 
 @enum Direction strictbelow below around above strictabove
 
@@ -125,19 +123,34 @@ range1(start, stop, step::Approach, length::Nothing) = range2(start, stop, step)
 
 function range2(start::Approach, stop, step)
     flength = floatlength(start, stop, step)
-    length = int(flength, opposite(start.direction))
+    dir = if step >= 0
+        opposite(start.direction)
+    else
+        start.direction
+    end
+    length = int(flength, dir)
     range(step=step, stop=stop, length=length)
 end
 
 function range2(start, stop::Approach, step)
     flength = floatlength(start, stop, step)
-    length = int(flength, stop.direction)
+    dir = if step >= 0
+        stop.direction
+    else
+        opposite(stop.direction)
+    end
+    length = int(flength, dir)
     range(start=start, step=step, length=length)
 end
 
 function range2(start, stop, step::Approach)
     flength = floatlength(start, stop, step)
-    length = int(flength, opposite(step.direction))
+    dir = if step.value >= 0
+        opposite(step.direction)
+    else
+        step.direction
+    end
+    length = int(flength, dir)
     range(start=start, stop=stop, length=length)
 end
 
@@ -147,6 +160,5 @@ value(x::Approach) = x.value
 function floatlength(start, stop, step)
     1 + (value(stop) - value(start)) / value(step)
 end
-
 
 end#moduel
