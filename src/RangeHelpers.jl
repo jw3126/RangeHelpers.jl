@@ -137,16 +137,16 @@ See also the docs of `Base.range`.
 """
 function range end
 
+function range(;start=nothing, stop=nothing, length=nothing, step=nothing)
+    range0(start, stop, step, length)
+end
+
 function range(start; stop=nothing, length=nothing, step=nothing)
     range1(start, stop, step, length)
 end
 
 function range(start, stop; length=nothing, step=nothing)
     range1(start, stop, step, length)
-end
-
-function range(;start=nothing, stop=nothing, length=nothing, step=nothing)
-    range0(start, stop, step, length)
 end
 
 function range0(start::Nothing, stop, step, length)
