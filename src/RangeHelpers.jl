@@ -94,6 +94,43 @@ function int(value, direction)::Int
     end
 end
 
+"""
+    range(start, stop; length, step)
+    range(start; stop, length, step)
+    range(;start, stop, length, step)
+
+Construct a range from the arguments. Three arguments must be given.
+
+```jldoctest
+julia> using RangeHelpers
+
+julia> using RangeHelpers: range
+
+julia> range(start=1, stop=3, length=3)
+1.0:1.0:3.0
+
+julia> range(start=1, stop=3.1, step=around(1))
+1.0:1.05:3.1
+
+julia> range(start=1, stop=around(3.1), step=1)
+1:1:3
+
+julia> range(start=1, stop=above(3.1), step=1)
+1:1:4
+
+julia> range(start=1, stop=above(3.0), step=1)
+1:1:3
+
+julia> range(start=around(0.9), stop=3.0, step=1)
+1.0:1.0:3.0
+
+julia> range(start=strictbelow(1.0), stop=3.0, step=1)
+0.0:1.0:3.0
+```
+See also the docs of `Base.range`.
+"""
+function range end
+
 function range(start; stop=nothing, length=nothing, step=nothing)
     range1(start, stop, step, length)
 end
