@@ -15,25 +15,6 @@ struct Approach{V}
     direction::Direction
 end
 
-function direction_string(direction::Direction)
-    if direction === strictbelow
-        "strictbelow"
-    elseif direction === below
-        "below"
-    elseif direction === around
-        "around"
-    elseif direction === above
-        "above"
-    elseif direction === strictabove
-        "strictabove"
-    else
-        msg = """
-        Unreachable direction = $direction
-        """
-        error(msg)
-    end
-end
-
 function Base.show(io::IO, o::Approach)
     direction = o.direction
     print(io, direction_string(direction), "(", o.value, ")")
