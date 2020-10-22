@@ -42,6 +42,11 @@ using Documenter
 end
 
 @testset "Explict" begin
+    @inferred range(1,2,length=2)
+    @inferred range(start=1,stop=2,length=2)
+    @inferred range(start=1,stop=2,step=0.1)
+    @inferred range(stop=2,step=0.1, length=3)
+    @inferred range(start=2,step=0.1, length=3)
 
     @testset "no directions" begin
         @test range(1, 2, length = 2) === 1.0:1.0:2.0

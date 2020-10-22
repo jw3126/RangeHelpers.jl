@@ -49,4 +49,3 @@ julia> prolong(r, pre=1, post=2)
 julia> prolong(r, start=below(0.4), stop=around(4.1))
 0.0:0.5:4.0
 ```
-```
