@@ -1,6 +1,7 @@
 module RangeHelpersTests
 using RangeHelpers: range
 using RangeHelpers
+const RH = RangeHelpers
 using Test
 using Documenter
 
@@ -126,13 +127,13 @@ end
 end
 
 # useful for creating test cases
-for dir in instances(RangeHelpers.Direction)
-    start = 2.1
-    stop = dir(0)
-    step = -1
-    r = range(start, stop, step=step)
-    println("@test range($start, $stop, step=$step) === $r")
-end
+#for dir in instances(RangeHelpers.Direction)
+#    start = 2.1
+#    stop = dir(0)
+#    step = -1
+#    r = range(start, stop, step=step)
+#    println("@test range($start, $stop, step=$step) === $r")
+#end
 
 @testset "asrange" begin
     @inferred asrange([1,2,3])
@@ -143,6 +144,24 @@ end
     @test_throws ArgumentError asrange([1,2,4])
     @test asrange([1]) == range(1,stop=1,length=1)
 end
+
+@testset "binwalls, bincenters" begin
+    for _ in 1:100
+        start = 10randn()
+        stop=10randn()
+        len=rand(3:100)
+        r = range(start, stop=stop, length=len)
+        w = RH.binwalls(r)
+        @test r ≈ RH.bincenters(RH.binwalls(r))
+        @test r ≈ RH.binwalls(RH.bincenters(r))
+    end
+    @test RH.binwalls(1:4) == [0.5, 1.5, 2.5, 3.5, 4.5]
+    @test RH.binwalls(1:4, first=false, last=true) == [1.5,2.5,3.5, 4.5]
+    @test RH.bincenters(1:2:9) == [2,4,6,8]
+    @inferred RH.bincenters(1:3)
+    @inferred RH.binwalls(1:3)
+end
+
 
 Documenter.doctest(RangeHelpers)
 end#module

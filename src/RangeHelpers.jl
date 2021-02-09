@@ -3,6 +3,7 @@ module RangeHelpers
 export strictbelow, below, around, above, strictabove
 export prolong
 export asrange
+export binwalls, bincenters
 
 # Use README as docstring
 @doc let path = joinpath(dirname(@__DIR__), "README.md")
@@ -294,5 +295,57 @@ function asrange(itr; check=true, kw...)
     end
     ret
 end
+
+"""
+    binwalls(r::AbstractRange; first=true, last=true)::AbstractRange
+
+If `r` is interpreted as a collection of bin centers, `binwalls` returns the bin boundaries.
+
+```jldoctest
+julia> using RangeHelpers: binwalls
+
+julia> binwalls(0.0:2.0:10.0)
+-1.0:2.0:11.0
+
+julia> binwalls(0.0:2.0:10.0, first=false)
+1.0:2.0:11.0
+
+julia> binwalls(0.0:2.0:10.0, last=false)
+-1.0:2.0:9.0
+```
+See also [`bincenters`](@ref).
+"""
+function binwalls(r::AbstractRange; first=true, last=true)::AbstractRange
+    h = (1//2) * step(r)
+    start = if first
+        Base.first(r) - h
+    else
+        Base.first(r) + h
+    end
+    stop = if last
+        Base.last(r) + h
+    else
+        Base.last(r) - h
+    end
+    len = length(r) + first + last - 1
+    return Base.range(start, stop=stop, length = len)
+end
+
+"""
+    bincenters(r::AbstractRange)::AbstractRange
+
+If `r` is interpreted as a collection of bin boundaries, `bincenters` returns the bin centers.
+```jldoctest
+julia> using RangeHelpers: bincenters
+
+julia> bincenters(1:10.0)
+1.5:1.0:9.5
+```
+See also [`binwalls`](@ref).
+"""
+function bincenters(r::AbstractRange)::AbstractRange
+    return binwalls(r, first=false, last=false)
+end
+
 
 end #module
