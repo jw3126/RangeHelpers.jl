@@ -1,3 +1,4 @@
+module RangeHelpersTests
 using RangeHelpers: range
 using RangeHelpers
 using Test
@@ -133,4 +134,15 @@ for dir in instances(RangeHelpers.Direction)
     println("@test range($start, $stop, step=$step) === $r")
 end
 
+@testset "asrange" begin
+    @inferred asrange([1,2,3])
+    @test asrange([1,2,3]) isa AbstractRange
+    @test asrange([1,2,3]) == 1:3
+    @test_broken asrange([1,2,3]) === 1:1:3
+    @test asrange(1:3) === 1:3
+    @test_throws ArgumentError asrange([1,2,4])
+    @test asrange([1]) == range(1,stop=1,length=1)
+end
+
 Documenter.doctest(RangeHelpers)
+end#module

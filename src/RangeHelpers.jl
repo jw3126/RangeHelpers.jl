@@ -2,6 +2,7 @@ module RangeHelpers
 
 export strictbelow, below, around, above, strictabove
 export prolong
+export asrange
 
 # Use README as docstring
 @doc let path = joinpath(dirname(@__DIR__), "README.md")
@@ -243,6 +244,55 @@ prolong_post(r, post::Nothing) = r
 function prolong_post(r, post)
     len = length(r) + post
     range(start=first(r), step=Base.step(r), length=len)
+end
+
+################################################################################
+##### asrange
+################################################################################
+
+"""
+    asrange(itr, check=true, atol, rtol)::AbstractRange
+
+Convert `itr` into a range, optionally validating the result.
+```jldoctest
+julia> using RangeHelpers
+
+julia> asrange([1,2,3])
+1.0:1.0:3.0
+
+julia> asrange([1,2,3])
+1.0:1.0:3.0
+
+julia> asrange(1:3)
+1:3
+
+julia> asrange([1,2,4])
+ERROR: ArgumentError: Cannot construct range from `itr`
+itr = [1, 2, 4]
+[...]
+
+julia> asrange([1,2,4], atol=10)
+1.0:1.5:4.0
+```
+"""
+function asrange end
+
+asrange(r::AbstractRange; kw...) = r
+function asrange(itr; check=true, kw...)
+    start= first(itr)
+    stop = last(itr)
+    len = length(itr)
+    ret = Base.range(start, stop=stop,length=len)
+    if check
+        if !isapprox(ret, itr; kw...)
+            msg = """
+            Cannot construct range from `itr`
+            itr = $(itr)
+            """
+            throw(ArgumentError(msg))
+        end
+    end
+    ret
 end
 
 end #module

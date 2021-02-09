@@ -1,7 +1,3 @@
-```@meta
-CurrentModule = RangeHelpers
-```
-
 # RangeHelpers
 
 ```@index
