@@ -296,6 +296,9 @@ function asrange(itr; check=true, kw...)
     ret
 end
 
+################################################################################
+##### bincenters, binwalls
+################################################################################
 """
     binwalls(r::AbstractRange; first=true, last=true)::AbstractRange
 
