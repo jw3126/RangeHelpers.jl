@@ -2,6 +2,7 @@ module RangeHelpers
 
 export strictbelow, below, around, above, strictabove
 export prolong
+export anchorrange
 export asrange
 export binwalls, bincenters
 
@@ -218,20 +219,27 @@ julia> prolong(r, start=below(0.4), stop=around(4.1))
 ```
 """
 function prolong(r::AbstractRange;start=nothing, stop=nothing, pre=nothing, post=nothing)
-    r1 = prolong_start(r, start)
-    r2 = prolong_stop(r1, stop)
+    r2 = prolong_start_stop(r, start, stop)
     r3 = prolong_pre_post(r2, pre, post)
     return r3
 end
 
-prolong_start(r, start::Nothing) = r
-function prolong_start(r, start::Approach)
+function prolong_start_stop(r, start::Nothing, stop::Nothing)
+    r
+end
+function prolong_start_stop(r, start::Approach, stop::Nothing)
     range(start, step=Base.step(r), stop=last(r))
 end
-
-prolong_stop(r, stop::Nothing) = r
-function prolong_stop(r, stop::Approach)
+function prolong_start_stop(r, start::Nothing, stop::Approach)
     range(first(r), stop=stop, step=Base.step(r))
+end
+function prolong_start_stop(r, start::Approach, stop::Approach)
+    anchor = first(r)
+    flength = floatlength(anchor, stop, step(r))
+    dir = step(r) >= 0 ? stop.direction : opposite(stop.direction)
+    len1 = int(flength, dir)
+    stop1 = anchor + (len1-1) * step(r)
+    return range(start=start, step=step(r), stop=stop1)
 end
 
 prolong_pre_post(r, pre::Nothing, post::Nothing) = r
@@ -248,6 +256,28 @@ function prolong_pre_post(r, pre, post)
     start = first(r) - pre*step(r)
     range(start=start, step=Base.step(r), length=len)
 end
+
+################################################################################
+##### anchorrange
+################################################################################
+"""
+
+    anchorrange(anchor; step, start, stop, pre, post)
+
+Return a range, that approximately has `anchor` on its grid.
+
+```jldoctest
+julia> using RangeHelpers
+
+julia> anchorrange(15.5, start=above(11), step=2, stop=below(15))
+11.5:2.0:13.5
+```
+"""
+function anchorrange(anchor; step, kw...)
+    r0 = anchor:step:anchor
+    return prolong(r0; kw...)
+end
+
 
 ################################################################################
 ##### asrange
