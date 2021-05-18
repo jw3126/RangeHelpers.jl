@@ -3,7 +3,6 @@ using RangeHelpers: range
 using RangeHelpers
 const RH = RangeHelpers
 using Test
-using Documenter
 
 @testset "prolong" begin
     @testset "pre post" begin
@@ -22,6 +21,10 @@ using Documenter
         @test_broken prolong(1:2, post=-1) === 1:1
         @test prolong(1:3, pre=1, post=-2) == 0:1
         @test_broken prolong(1:3, pre=1, post=-2) === 0:1
+
+        @test prolong(1:1, pre=1, post=-1) == 0:0
+        @test_broken prolong(1:1, pre=1, post=-1) === 0:0
+        @test prolong(1:1, pre=-1, post=1) == 2:2
     end
 
     @testset "start" begin
@@ -38,7 +41,6 @@ using Documenter
         @test prolong(1:10, stop=around(5)) == 1:5
         @test prolong(1:10.0, stop=around(5)) === 1:5.0
         @test_broken prolong(1:10, stop=around(5)) === 1:5
-
     end
 
 end
@@ -163,5 +165,4 @@ end
 end
 
 
-Documenter.doctest(RangeHelpers)
 end#module

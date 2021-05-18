@@ -220,9 +220,8 @@ julia> prolong(r, start=below(0.4), stop=around(4.1))
 function prolong(r::AbstractRange;start=nothing, stop=nothing, pre=nothing, post=nothing)
     r1 = prolong_start(r, start)
     r2 = prolong_stop(r1, stop)
-    r3 = prolong_pre(r2, pre)
-    r4 = prolong_post(r3, post)
-    return r4
+    r3 = prolong_pre_post(r2, pre, post)
+    return r3
 end
 
 prolong_start(r, start::Nothing) = r
@@ -235,16 +234,19 @@ function prolong_stop(r, stop::Approach)
     range(first(r), stop=stop, step=Base.step(r))
 end
 
-prolong_pre(r, pre::Nothing) = r
-function prolong_pre(r, pre::Integer)
+prolong_pre_post(r, pre::Nothing, post::Nothing) = r
+function prolong_pre_post(r, pre::Integer, post::Nothing)
     len = length(r) + pre
     range(stop=last(r), step=Base.step(r), length=len)
 end
-
-prolong_post(r, post::Nothing) = r
-function prolong_post(r, post)
+function prolong_pre_post(r, pre::Nothing, post::Integer)
     len = length(r) + post
     range(start=first(r), step=Base.step(r), length=len)
+end
+function prolong_pre_post(r, pre, post)
+    len = length(r) + pre + post
+    start = first(r) - pre*step(r)
+    range(start=start, step=Base.step(r), length=len)
 end
 
 ################################################################################
