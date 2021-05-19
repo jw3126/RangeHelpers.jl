@@ -3,6 +3,7 @@ module RangeHelpers
 export strictbelow, below, around, above, strictabove
 export prolong
 export anchorrange
+export symrange
 export asrange
 export binwalls, bincenters
 
@@ -278,6 +279,42 @@ function anchorrange(anchor; step, kw...)
     return prolong(r0; kw...)
 end
 
+################################################################################
+##### symrange
+################################################################################
+
+"""
+    symrange(;center=0, step, length)
+
+Construct a range, that is symmetric around center.
+"""
+function symrange(;center=0, start=nothing, step=nothing, stop=nothing, length=nothing)
+    _symrange(center, start, step, stop, length)
+end
+
+function _symrange(center, start, step, stop, length)
+    msg = """
+    Cannot construct symmetric range from arguments:
+    center = $center
+    start = $start
+    step = $step
+    stop = $stop
+    length = $length
+    """
+    throw(ArgumentError(msg))
+end
+
+function _symrange(center, start::Nothing, step, stop::Nothing, length)
+    c = float(something(center, zero(step)))
+    if isodd(length)
+        hl = Int((length - 1)/2)
+        anchorrange(c, pre=hl, post=hl, step=step)
+    else
+        hl = length ÷ 2
+        walls = anchorrange(c, pre=hl, post=hl, step=step)
+        bincenters(walls)
+    end
+end
 
 ################################################################################
 ##### asrange
@@ -381,6 +418,5 @@ See also [`binwalls`](@ref).
 function bincenters(r::AbstractRange)::AbstractRange
     return binwalls(r, first=false, last=false)
 end
-
 
 end #module

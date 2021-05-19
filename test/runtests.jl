@@ -4,6 +4,16 @@ using RangeHelpers
 const RH = RangeHelpers
 using Test
 
+@testset "symrange" begin
+    r = @inferred symrange(step=1, length=2)
+    @test r === -0.5:1.0:0.5
+    r = @inferred symrange(step=1, length=3)
+    @test r === -1.0:1.0:1.0
+
+    r = @inferred symrange(center=10f0, step=2, length=3)
+    @test r === 8f0:2f0:12f0
+end
+
 @testset "prolong" begin
     @testset "pre post" begin
         @inferred prolong(1:2, pre=1)
