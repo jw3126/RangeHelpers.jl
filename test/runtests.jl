@@ -4,6 +4,7 @@ using RangeHelpers
 const RH = RangeHelpers
 using Test
 
+using Test
 @testset "symrange" begin
     r = @inferred symrange(step=1, length=2)
     @test r === -0.5:1.0:0.5
@@ -185,5 +186,9 @@ end
     @inferred RH.binwalls(1:3)
 end
 
+@testset "doctest" begin
+    import Documenter
+    Documenter.doctest(RangeHelpers)
+end
 
 end#module

@@ -287,6 +287,19 @@ end
     symrange(;center=0, step, length)
 
 Construct a range, that is symmetric around center.
+
+```jldoctest
+julia> using RangeHelpers
+
+julia> symrange(length=2, step=1)
+-0.5:1.0:0.5
+
+julia> symrange(length=3, step=1)
+-1.0:1.0:1.0
+
+julia> symrange(length=3, step=1, center=4)
+3.0:1.0:5.0
+```
 """
 function symrange(;center=0, start=nothing, step=nothing, stop=nothing, length=nothing)
     _symrange(center, start, step, stop, length)
@@ -321,7 +334,7 @@ end
 ################################################################################
 
 """
-    asrange(itr, check=true, atol, rtol)::AbstractRange
+    asrange(itr; check=true, atol, rtol)::AbstractRange
 
 Convert `itr` into a range, optionally validating the result.
 ```jldoctest
