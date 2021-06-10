@@ -20,18 +20,10 @@ using Test
     r = @inferred symrange(start=around(-4.1), step=2, center=1)
     @test r === -4.0:2.0:6.0
 
-    r = symrange(stop=around(4.1), step=2, center=1)
-    @test_broken begin
-        @inferred symrange(stop=around(4.1), step=2, center=1)
-        true
-    end
+    r = @inferred symrange(stop=around(4.1), step=2, center=1)
     @test r === -2.0:2.0:4.0
 
-    r = symrange(start=above(2), step=-1)
-    @test_broken begin
-        @inferred symrange(start=above(2), step=-1)
-        true
-    end
+    r = @inferred symrange(start=above(2), step=-1)
     @test r === 2.0:-1.0:-2.0
 
     r = @inferred symrange(stop=strictabove(-2), step=-1)
@@ -69,6 +61,7 @@ end
         @test prolong(1e9:1e10, start=below(10), stop=around(15.1)) == 10:15
     end
     @testset "anchorrange" begin
+        @inferred anchorrange(15.5, start=above(11), step=2, stop=below(15))
         @test anchorrange(15.5, start=above(11), step=2, stop=below(15)) === 11.5:2.0:13.5
     end
 

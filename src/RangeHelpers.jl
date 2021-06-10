@@ -126,33 +126,33 @@ See also the docs of `Base.range`.
 function range end
 
 function range(;start=nothing, stop=nothing, length=nothing, step=nothing)
-    range0(start, stop, step, length)
+    range0(start, step, stop, length)
 end
 
 function range(start; stop=nothing, length=nothing, step=nothing)
-    range1(start, stop, step, length)
+    range1(start, step, stop, length)
 end
 
 function range(start, stop; length=nothing, step=nothing)
-    range1(start, stop, step, length)
+    range1(start, step, stop, length)
 end
 
-function range0(start::Nothing, stop, step, length)
+function range0(start::Nothing, step, stop, length)
     start = stop - (length-1) * step
     range(start, stop=stop, length=length::Integer)
 end
 
-function range0(start, stop, step, length)
+function range0(start, step, stop, length)
     range(start, stop=stop, step=step, length=length)
 end
 
-range1(start, stop, step, length) = Base.range(start, stop=stop, step=step, length=length)
-range1(start, stop, step, length::Nothing) = Base.range(start, stop=stop, step=step)
-range1(start::Approach, stop, step, length::Nothing) = range2(start, stop, step)
-range1(start, stop::Approach, step, length::Nothing) = range2(start, stop, step)
-range1(start, stop, step::Approach, length::Nothing) = range2(start, stop, step)
+range1(start, step, stop, length) = Base.range(start, stop=stop, step=step, length=length)
+range1(start, step, stop, length::Nothing) = Base.range(start, stop=stop, step=step)
+range1(start::Approach, step, stop, length::Nothing) = range_start_step_stop(start,step,stop)
+range1(start, step, stop::Approach, length::Nothing) = range_start_step_stop(start,step,stop)
+range1(start, step::Approach, stop, length::Nothing) = range_start_step_stop(start,step,stop)
 
-function range2(start::Approach, stop, step)
+function range_start_step_stop(start::Approach, step, stop)
     flength = floatlength(start, stop, step)
     dir = if step >= 0
         opposite(start.direction)
@@ -163,7 +163,7 @@ function range2(start::Approach, stop, step)
     range(step=step, stop=stop, length=length)
 end
 
-function range2(start, stop::Approach, step)
+function range_start_step_stop(start, step, stop::Approach)
     flength = floatlength(start, stop, step)
     dir = if step >= 0
         stop.direction
@@ -174,7 +174,7 @@ function range2(start, stop::Approach, step)
     range(start=start, step=step, length=length)
 end
 
-function range2(start, stop, step::Approach)
+function range_start_step_stop(start, step::Approach, stop)
     flength = floatlength(start, stop, step)
     dir = if step.value >= 0
         opposite(step.direction)
@@ -339,23 +339,25 @@ function _symrange(center, start::Nothing, step, stop::Nothing, length)
 end
 
 function _symrange(center, start::Approach, step, stop::Nothing, length::Nothing)
-    r = range(step=step/2, start=start, stop=center)
-    s = if last(r) == center
+    r = range_start_step_stop(start, step/2, center)
+    start_ = if last(r) == center
         first(r)
     else
         last(r)
     end
-    return range(start=s, step=step, stop=around(2*center-s))
+    stop_ = around(2*center-start_)
+    return range_start_step_stop(start_, step, stop_)
 end
 
 function _symrange(center, start::Nothing, step, stop::Approach, length::Nothing)
-    r = range(step=step/2, stop=stop, start=center)
-    s = if first(r) == center
+    r = range_start_step_stop(center, step/2, stop)
+    stop_ = if first(r) == center
         last(r)
     else
         first(r)
     end
-    return range(stop=s, step=step, start=around(2*center-s))
+    start_ = around(2*center-stop_)
+    return range_start_step_stop(start_, step, stop_)
 end
 
 ################################################################################
