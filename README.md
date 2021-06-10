@@ -6,8 +6,6 @@
 [![Build Status](https://travis-ci.com/jw3126/RangeHelpers.jl.svg?branch=master)](https://travis-ci.com/jw3126/RangeHelpers.jl)
 [![Coverage](https://codecov.io/gh/jw3126/RangeHelpers.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/jw3126/RangeHelpers.jl)
 
-# Usage
-
 Ever needed a range with startpoint 10, endpoint 121.7 and a step of 25?
 Well that is mathematically not possible, so you need to compromise.
 There are lots of options, you could relax the startpoint, endpoint or step. In the past doing this was annoying and prone to off-by-one-errors:
@@ -17,9 +15,6 @@ range(10, length=ceil(Int, (121.7-10)/25), stop=121.7);
 [RangeHelpers.jl](https://github.com/jw3126/RangeHelpers.jl) aims to solve this and related range constructions once and for all:
 ```julia
 julia> import RangeHelpers as RH
-
-julia> RH.range(start=10, stop=121.7, step=25)
-10.0:25.0:110.0
 
 julia> RH.range(start=10, stop=121.7, step=RH.around(25)) # compromise on step
 10.0:27.925:121.7
