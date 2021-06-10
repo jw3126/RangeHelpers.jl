@@ -284,7 +284,7 @@ end
 ################################################################################
 
 """
-    symrange(;center=0, step, length)
+    symrange(;center=0, step, length, start, stop)
 
 Construct a range, that is symmetric around center.
 
@@ -299,6 +299,15 @@ julia> symrange(length=3, step=1)
 
 julia> symrange(length=3, step=1, center=4)
 3.0:1.0:5.0
+
+julia> symrange(start=around(-4.1), step=2)
+-4.0:2.0:4.0
+
+julia> symrange(start=around(-4.1), step=2, center=1)
+-4.0:2.0:6.0
+
+julia> symrange(stop=around(4.1), step=2, center=1)
+-2.0:2.0:4.0
 ```
 """
 function symrange(;center=0, start=nothing, step=nothing, stop=nothing, length=nothing)
@@ -327,6 +336,26 @@ function _symrange(center, start::Nothing, step, stop::Nothing, length)
         walls = anchorrange(c, pre=hl, post=hl, step=step)
         bincenters(walls)
     end
+end
+
+function _symrange(center, start::Approach, step, stop::Nothing, length::Nothing)
+    r = range(step=step/2, start=start, stop=center)
+    s = if last(r) == center
+        first(r)
+    else
+        last(r)
+    end
+    return range(start=s, step=step, stop=around(2*center-s))
+end
+
+function _symrange(center, start::Nothing, step, stop::Approach, length::Nothing)
+    r = range(step=step/2, stop=stop, start=center)
+    s = if first(r) == center
+        last(r)
+    else
+        first(r)
+    end
+    return range(stop=s, step=step, start=around(2*center-s))
 end
 
 ################################################################################

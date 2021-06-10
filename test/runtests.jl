@@ -13,6 +13,29 @@ using Test
 
     r = @inferred symrange(center=10f0, step=2, length=3)
     @test r === 8f0:2f0:12f0
+
+    r = symrange(start=around(-4), step=2)
+    @test r === -4.0:2.0:4.0
+
+    r = @inferred symrange(start=around(-4.1), step=2, center=1)
+    @test r === -4.0:2.0:6.0
+
+    r = symrange(stop=around(4.1), step=2, center=1)
+    @test_broken begin
+        @inferred symrange(stop=around(4.1), step=2, center=1)
+        true
+    end
+    @test r === -2.0:2.0:4.0
+
+    r = symrange(start=above(2), step=-1)
+    @test_broken begin
+        @inferred symrange(start=above(2), step=-1)
+        true
+    end
+    @test r === 2.0:-1.0:-2.0
+
+    r = @inferred symrange(stop=strictabove(-2), step=-1)
+    @test r === 1.5:-1.0:-1.5
 end
 
 @testset "prolong" begin
