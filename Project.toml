@@ -1,7 +1,7 @@
 name = "RangeHelpers"
 uuid = "3a07dd3d-1c52-4395-8858-40c6328157db"
 authors = ["Jan Weidner <jw3126@gmail.com> and contributors"]
-version = "0.1.4"
+version = "0.1.3"
 
 [compat]
 julia = "1"
