@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · RangeHelpers.jl</title><link rel="canonical" href="https://jw3126.github.io/RangeHelpers.jl/"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">RangeHelpers.jl</span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jw3126/RangeHelpers.jl/blob/master/docs/src/index.md#L" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="RangeHelpers"><a class="docs-heading-anchor" href="#RangeHelpers">RangeHelpers</a><a id="RangeHelpers-1"></a><a class="docs-heading-anchor-permalink" href="#RangeHelpers" title="Permalink"></a></h1><ul><li><a href="#RangeHelpers.RangeHelpers"><code>RangeHelpers.RangeHelpers</code></a></li><li><a href="#RangeHelpers.anchorrange-Tuple{Any}"><code>RangeHelpers.anchorrange</code></a></li><li><a href="#RangeHelpers.asrange"><code>RangeHelpers.asrange</code></a></li><li><a href="#RangeHelpers.bincenters-Tuple{AbstractRange}"><code>RangeHelpers.bincenters</code></a></li><li><a href="#RangeHelpers.binwalls-Tuple{AbstractRange}"><code>RangeHelpers.binwalls</code></a></li><li><a href="#RangeHelpers.prolong-Tuple{AbstractRange}"><code>RangeHelpers.prolong</code></a></li><li><a href="#RangeHelpers.range"><code>RangeHelpers.range</code></a></li><li><a href="#RangeHelpers.subdivide-Tuple{AbstractRange, Integer}"><code>RangeHelpers.subdivide</code></a></li><li><a href="#RangeHelpers.symrange-Tuple{}"><code>RangeHelpers.symrange</code></a></li></ul><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.RangeHelpers" href="#RangeHelpers.RangeHelpers"><code>RangeHelpers.RangeHelpers</code></a> — <span class="docstring-category">Module</span></header><section><div><p><strong>RangeHelpers</strong></p><p><a href="https://jw3126.github.io/RangeHelpers.jl/stable"><img src="https://img.shields.io/badge/docs-stable-blue.svg" alt="Stable"/></a> <a href="https://jw3126.github.io/RangeHelpers.jl/dev"><img src="https://img.shields.io/badge/docs-dev-blue.svg" alt="Dev"/></a> <a href="https://github.com/jw3126/RangeHelpers.jl/actions"><img src="https://github.com/jw3126/RangeHelpers.jl/workflows/CI/badge.svg" alt="Build Status"/></a> <a href="https://travis-ci.com/jw3126/RangeHelpers.jl"><img src="https://travis-ci.com/jw3126/RangeHelpers.jl.svg?branch=master" alt="Build Status"/></a> <a href="https://codecov.io/gh/jw3126/RangeHelpers.jl"><img src="https://codecov.io/gh/jw3126/RangeHelpers.jl/branch/master/graph/badge.svg" alt="Coverage"/></a></p><p>Ever needed a range with startpoint 10, endpoint 121.7 and a step of 25? Well that is mathematically not possible, so you need to compromise. There are lots of options, you could relax the startpoint, endpoint or step. In the past doing this was annoying and prone to off-by-one-errors:</p><pre><code class="language-julia-repl">julia&gt; Base.range(10, step=25, length=round(Int, (121.7-10)/25)); # is it correct??</code></pre><p><a href="https://github.com/jw3126/RangeHelpers.jl">RangeHelpers.jl</a> aims to solve range construction headaches once and for all:</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers: range
+
+julia&gt; using RangeHelpers
+
+julia&gt; range(start=10, stop=121.7, step=around(25)) # compromise on step
+10.0:27.925:121.7
+
+julia&gt; range(start=10, stop=121.7, step=below(25))  # compromise step at most 25
+10.0:22.34:121.7
+
+julia&gt; range(start=10, stop=above(121.7), step=25)  # exact step, but allow bigger endpoint
+10:25:135
+
+julia&gt; anchorrange(42, start=around(10), step=25, stop=around(121.7)) # make sure 42 is on the grid
+17.0:25.0:117.0</code></pre><p>See <a href="https://jw3126.github.io/RangeHelpers.jl/dev/">the documentation</a> for even more ways to make ranges.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL12-L46">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.anchorrange-Tuple{Any}" href="#RangeHelpers.anchorrange-Tuple{Any}"><code>RangeHelpers.anchorrange</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">anchorrange(anchor; step, start, stop, pre, post)</code></pre><p>Return a range, that approximately has <code>anchor</code> on its grid.</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers
+
+julia&gt; anchorrange(15.5, start=above(11), step=2, stop=below(15))
+11.5:2.0:13.5</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL266-L278">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.asrange" href="#RangeHelpers.asrange"><code>RangeHelpers.asrange</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">asrange(itr; check=true, atol, rtol)::AbstractRange</code></pre><p>Convert <code>itr</code> into a range, optionally validating the result.</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers
+
+julia&gt; asrange([1,2,3])
+1.0:1.0:3.0
+
+julia&gt; asrange([1,2,3])
+1.0:1.0:3.0
+
+julia&gt; asrange(1:3)
+1:3
+
+julia&gt; asrange([1,2,4])
+ERROR: ArgumentError: Cannot construct range from `itr`
+itr = [1, 2, 4]
+[...]
+
+julia&gt; asrange([1,2,4], atol=10)
+1.0:1.5:4.0</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL369-L393">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.bincenters-Tuple{AbstractRange}" href="#RangeHelpers.bincenters-Tuple{AbstractRange}"><code>RangeHelpers.bincenters</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">bincenters(r::AbstractRange)::AbstractRange</code></pre><p>If <code>r</code> is interpreted as a collection of bin boundaries, <code>bincenters</code> returns the bin centers.</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers: bincenters
+
+julia&gt; bincenters(1:10.0)
+1.5:1.0:9.5</code></pre><p>See also <a href="#RangeHelpers.binwalls-Tuple{AbstractRange}"><code>binwalls</code></a>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL452-L463">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.binwalls-Tuple{AbstractRange}" href="#RangeHelpers.binwalls-Tuple{AbstractRange}"><code>RangeHelpers.binwalls</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">binwalls(r::AbstractRange; first=true, last=true)::AbstractRange</code></pre><p>If <code>r</code> is interpreted as a collection of bin centers, <code>binwalls</code> returns the bin boundaries.</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers: binwalls
+
+julia&gt; binwalls(0.0:2.0:10.0)
+-1.0:2.0:11.0
+
+julia&gt; binwalls(0.0:2.0:10.0, first=false)
+1.0:2.0:11.0
+
+julia&gt; binwalls(0.0:2.0:10.0, last=false)
+-1.0:2.0:9.0</code></pre><p>See also <a href="#RangeHelpers.bincenters-Tuple{AbstractRange}"><code>bincenters</code></a>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL417-L435">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.prolong-Tuple{AbstractRange}" href="#RangeHelpers.prolong-Tuple{AbstractRange}"><code>RangeHelpers.prolong</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">prolong(r::AbstractRange;start=nothing, stop=nothing, pre=nothing, post=nothing)</code></pre><p>Prolong an existing range <code>r</code> according to the arguments:</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers
+
+julia&gt; r = 1.0:0.5:3.0
+1.0:0.5:3.0
+
+julia&gt; prolong(r, stop=around(4))
+1.0:0.5:4.0
+
+julia&gt; prolong(r, pre=1)
+0.5:0.5:3.0
+
+julia&gt; prolong(r, pre=1, post=2)
+0.5:0.5:4.0
+
+julia&gt; prolong(r, start=below(0.4), stop=around(4.1))
+0.0:0.5:4.0</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL200-L223">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.range" href="#RangeHelpers.range"><code>RangeHelpers.range</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">range(start, stop; length, step)
+range(start; stop, length, step)
+range(;start, stop, length, step)</code></pre><p>Construct a range from the arguments. Three arguments must be given.</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers
+
+julia&gt; using RangeHelpers: range
+
+julia&gt; range(start=1, stop=3, length=3)
+1.0:1.0:3.0
+
+julia&gt; range(start=1, stop=3.1, step=around(1))
+1.0:1.05:3.1
+
+julia&gt; range(start=1, stop=around(3.1), step=1)
+1:1:3
+
+julia&gt; range(start=1, stop=above(3.1), step=1)
+1:1:4
+
+julia&gt; range(start=1, stop=above(3.0), step=1)
+1:1:3
+
+julia&gt; range(start=around(0.9), stop=3.0, step=1)
+1.0:1.0:3.0
+
+julia&gt; range(start=strictbelow(1.0), stop=3.0, step=1)
+0.0:1.0:3.0</code></pre><p>See also the docs of <code>Base.range</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL93-L127">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.subdivide-Tuple{AbstractRange, Integer}" href="#RangeHelpers.subdivide-Tuple{AbstractRange, Integer}"><code>RangeHelpers.subdivide</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">subdivide(r::AbstractRange, factor::Integer, mode=:walls)</code></pre><p>Create a range with smaller step from <code>r</code>. Possible values for mode are (:walls, :centers).</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers
+
+julia&gt; r = 1:3.0
+1.0:1.0:3.0
+
+julia&gt; subdivide(r, 2)
+1.0:0.5:3.0
+
+julia&gt; subdivide(r, 4)
+1.0:0.25:3.0
+
+julia&gt; subdivide(r, 2, mode=:walls)
+1.0:0.5:3.0
+
+julia&gt; subdivide(r, 2, mode=:centers)
+0.75:0.5:3.25
+
+julia&gt; subdivide(r, 10, mode=:centers)
+0.55:0.1:3.45</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL473-L499">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="RangeHelpers.symrange-Tuple{}" href="#RangeHelpers.symrange-Tuple{}"><code>RangeHelpers.symrange</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">symrange(;center=0, step, length, start, stop)</code></pre><p>Construct a range, that is symmetric around center.</p><pre><code class="language-julia-repl">julia&gt; using RangeHelpers
+
+julia&gt; symrange(length=2, step=1)
+-0.5:1.0:0.5
+
+julia&gt; symrange(length=3, step=1)
+-1.0:1.0:1.0
+
+julia&gt; symrange(length=3, step=1, center=4)
+3.0:1.0:5.0
+
+julia&gt; symrange(start=around(-4.1), step=2)
+-4.0:2.0:4.0
+
+julia&gt; symrange(start=around(-4.1), step=2, center=1)
+-4.0:2.0:6.0
+
+julia&gt; symrange(stop=around(4.1), step=2, center=1)
+-2.0:2.0:4.0</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jw3126/RangeHelpers.jl/blob/217ad6c381da14722deaa72f36be7493510d90e7/src/RangeHelpers.jl#LL288-L314">source</a></section></article></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 21 June 2021 13:57">Monday 21 June 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
