@@ -373,32 +373,35 @@ Convert `itr` into a range, optionally validating the result.
 ```jldoctest
 julia> using RangeHelpers
 
-julia> asrange([1,2,3])
+julia> asrange([1,2,3.0])
 1.0:1.0:3.0
 
 julia> asrange([1,2,3])
-1.0:1.0:3.0
+1:1:3
 
 julia> asrange(1:3)
 1:3
 
-julia> asrange([1,2,4])
+julia> asrange([1,2,4.0])
 ERROR: ArgumentError: Cannot construct range from `itr`
-itr = [1, 2, 4]
+itr = [1.0, 2.0, 4.0]
 [...]
 
-julia> asrange([1,2,4], atol=10)
+julia> asrange([1,2,4.0], atol=10)
 1.0:1.5:4.0
 ```
 """
 function asrange end
 
 asrange(r::AbstractRange; kw...) = r
-function asrange(itr; check=true, kw...)
-    start= first(itr)
-    stop = last(itr)
+function asrange(itr; kw...)
+    start = first(itr)
+    stop  = last(itr)
     len = length(itr)
     ret = Base.range(start, stop=stop,length=len)
+    validate_asrange(ret, itr; kw...)
+end
+function validate_asrange(ret, itr; check=true, kw...)
     if check
         if !isapprox(ret, itr; kw...)
             msg = """
@@ -410,6 +413,19 @@ function asrange(itr; check=true, kw...)
     end
     ret
 end
+
+function asrange(arr::AbstractArray{<:Integer}; kw...)
+    start = first(arr)
+    if length(arr) > 1
+        step = arr[begin+1] - start
+    else
+        step = oneunit(start)
+    end
+    len = length(arr)
+    ret = Base.range(start, step=step, length=len)
+    validate_asrange(ret, arr; kw...)
+end
+
 
 ################################################################################
 ##### bincenters, binwalls

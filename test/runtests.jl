@@ -197,8 +197,7 @@ end
 @testset "asrange" begin
     @inferred asrange([1,2,3])
     @test asrange([1,2,3]) isa AbstractRange
-    @test asrange([1,2,3]) == 1:3
-    @test_broken asrange([1,2,3]) === 1:1:3
+    @test asrange([1,2,3]) === 1:1:3
     @test asrange(1:3) === 1:3
     @test_throws ArgumentError asrange([1,2,4])
     @test asrange([1]) == range(1,stop=1,length=1)
