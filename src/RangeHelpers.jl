@@ -6,6 +6,7 @@ export anchorrange
 export symrange
 export asrange
 export binwalls, bincenters
+export subdivide
 
 # Use README as docstring
 @doc let path = joinpath(dirname(@__DIR__), "README.md")
@@ -462,6 +463,67 @@ See also [`binwalls`](@ref).
 """
 function bincenters(r::AbstractRange)::AbstractRange
     return binwalls(r, first=false, last=false)
+end
+
+################################################################################
+##### subdivide
+################################################################################
+const ALLOWED_subdivide_modes = (:walls, :centers)
+
+"""
+    subdivide(r::AbstractRange, factor::Integer, mode=:walls)
+
+Create a range with smaller step from `r`. Possible values for mode are $(ALLOWED_subdivide_modes).
+
+```jldoctest
+julia> using RangeHelpers
+
+julia> r = 1:3.0
+1.0:1.0:3.0
+
+julia> subdivide(r, 2)
+1.0:0.5:3.0
+
+julia> subdivide(r, 4)
+1.0:0.25:3.0
+
+julia> subdivide(r, 2, mode=:walls)
+1.0:0.5:3.0
+
+julia> subdivide(r, 2, mode=:centers)
+0.75:0.5:3.25
+
+julia> subdivide(r, 10, mode=:centers)
+0.55:0.1:3.45
+```
+"""
+function subdivide(r::AbstractRange, factor::Integer; mode=:walls)
+    if factor < 1
+        msg = """
+        factor >= 1 must hold. Got:
+        factor = $factor
+        """
+        throw(ArgumentError(msg))
+    end
+    if !(mode in ALLOWED_subdivide_modes)
+        msg = """
+        The mode must be one of $(ALLOWED_subdivide_modes). Got:
+        mode = $mode
+        """
+        throw(ArgumentError(msg))
+    end
+    h = (factor - 1)/(2*factor) * step(r)
+    if mode === :walls
+        h = zero(h)
+        len = factor*(length(r) - 1) + 1
+    elseif mode === :centers
+        len = factor*length(r)
+    else
+        error("Unreachable mode = $mode")
+    end
+    start = first(r) - h
+    stop = last(r) + h
+    return Base.range(start, stop, length=len)
 end
 
 end #module

@@ -5,6 +5,25 @@ const RH = RangeHelpers
 using Test
 
 using Test
+@testset "subdivide" begin
+    @test subdivide(1.0:2:9.0, 2) == 1:1:9
+    @test subdivide(1.0:3, 10) === 1.0:0.1:3.0
+
+    @inferred subdivide(1:3, 2)
+    @inferred subdivide(1:3, 2, mode=:centers)
+    @test_throws ArgumentError subdivide(1:3, 2, mode=:nonsense)
+    @test_throws ArgumentError subdivide(1:3, 0)
+
+    for _ in 1:100
+        r = RH.range(start=100*randn(), step=randn(), length=rand(2:100))
+        @test subdivide(subdivide(r, 2), 2) == subdivide(r, 4)
+        @test subdivide(subdivide(r, 2,mode=:walls), 3,mode=:walls) == subdivide(r, 2*3, mode=:walls)
+
+        @test subdivide(subdivide(r, 2,mode=:centers), 3,mode=:centers) ≈
+            subdivide(r, 2*3, mode=:centers)
+    end
+end
+
 @testset "symrange" begin
     r = @inferred symrange(step=1, length=2)
     @test r === -0.5:1.0:0.5
@@ -206,5 +225,6 @@ end
     import Documenter
     Documenter.doctest(RangeHelpers)
 end
+
 
 end#module
