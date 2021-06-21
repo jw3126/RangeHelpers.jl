@@ -523,7 +523,7 @@ function subdivide(r::AbstractRange, factor::Integer; mode=:walls)
     end
     start = first(r) - h
     stop = last(r) + h
-    return Base.range(start, stop, length=len)
+    return Base.range(start, stop=stop, length=len)
 end
 
 end #module
