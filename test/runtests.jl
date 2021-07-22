@@ -220,6 +220,66 @@ end
     @inferred RH.binwalls(1:3)
 end
 
+@testset "searchsortedat" begin
+    @test RH.searchsortedat(10:10:30, RH.around(-Inf)) === 1
+    @test RH.searchsortedat(10:10:30, RH.around(-100)) === 1
+    @test RH.searchsortedat(10:10:30, RH.around(5)) === 1
+    @test RH.searchsortedat(10:10:30, RH.around(10)) === 1
+    @test RH.searchsortedat(10:10:30, RH.around(14)) === 1
+    @test RH.searchsortedat(10:10:30, RH.around(16.0)) === 2
+    @test RH.searchsortedat(10:10:30, RH.around(20.0)) === 2
+    @test RH.searchsortedat(10:10:30, RH.around(24.0)) === 2
+    @test RH.searchsortedat(10:10:30, RH.around(26.0)) === 3
+    @test RH.searchsortedat(10:10:30, RH.around(30)) === 3
+    @test RH.searchsortedat(10:10:30, RH.around(50)) === 3
+    @test RH.searchsortedat(10:10:30, RH.around(Inf)) === 3
+
+    for _ in 1:100
+        r = sort!(randn(rand(2:10)))
+        x = randn()
+        isbe = RH.searchsortedat(r, RH.strictbelow(x))
+        ibe  = RH.searchsortedat(r, RH.below(x))
+        iar  = RH.searchsortedat(r, RH.around(x))
+        iab  = RH.searchsortedat(r, RH.above(x))
+        isab = RH.searchsortedat(r, RH.strictabove(x))
+        @test iar-1 <= isbe == ibe <= iar <= iab == isab <= isbe + 1
+        @test_throws ArgumentError RH.searchsortedat(r, x)
+        @test iar in eachindex(r)
+        if ibe < firstindex(r)
+            @test x < first(r)
+        else
+            @test r[ibe] < x
+        end
+        if iab > lastindex(r)
+            @test x > last(r)
+        else
+            @test r[iab] > x
+        end
+
+        i = rand(eachindex(r))
+        x = r[i]
+        @test RH.searchsortedat(r, RH.strictbelow(x)) == i-1
+        @test RH.searchsortedat(r, RH.below(x)) == i
+        @test RH.searchsortedat(r, RH.around(x)) == i
+        @test RH.searchsortedat(r, RH.above(x)) == i
+        @test RH.searchsortedat(r, RH.strictabove(x)) == i+1
+        @test RH.searchsortedat(r, x) == i
+    end
+    @inferred RH.searchsortedat(10:10:30, RH.around(4))
+    @inferred RH.searchsortedat(10:10:30, RH.around(4.4))
+    @inferred RH.searchsortedat(collect(10:10:30), RH.around(4.4))
+
+    # double points
+    coll = [1,1,1]
+    @test RH.searchsortedat(coll, strictabove(1)) === 4
+    @test RH.searchsortedat(coll, strictabove(0)) === 1
+    @test RH.searchsortedat(coll, strictbelow(1)) === 0
+    @test RH.searchsortedat(coll, strictbelow(2)) === 3
+    coll = [0,1,1,1,2]
+    @test RH.searchsortedat(coll, strictabove(1)) === 5
+    @test RH.searchsortedat(coll, strictbelow(1)) === 1
+end
+
 @testset "doctest" begin
     import Documenter
     Documenter.doctest(RangeHelpers)

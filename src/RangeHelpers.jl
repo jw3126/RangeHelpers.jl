@@ -1,5 +1,7 @@
 module RangeHelpers
 
+using LinearAlgebra: norm
+
 export strictbelow, below, around, above, strictabove
 export prolong
 export anchorrange
@@ -7,6 +9,7 @@ export symrange
 export asrange
 export binwalls, bincenters
 export subdivide
+export searchsortedat
 
 # Use README as docstring
 @doc let path = joinpath(dirname(@__DIR__), "README.md")
@@ -540,6 +543,89 @@ function subdivide(r::AbstractRange, factor::Integer; mode=:walls)
     start = first(r) - h
     stop = last(r) + h
     return Base.range(start, stop=stop, length=len)
+end
+
+################################################################################
+##### searchsortedat
+################################################################################
+"""
+    searchsortedat(coll, x)
+
+Return the index of a sorted collection `coll` whose corresponding
+element is closest to `x`. If `coll` is not sorted, `searchsortedat` might
+silently return a wrong result.
+
+```jldoctest
+julia> using RangeHelpers
+
+julia> searchsortedat(100:100:1000, around(200))
+2
+
+julia> searchsortedat(100:100:1000, around(249))
+2
+
+julia> searchsortedat(100:100:1000, around(251))
+3
+
+julia> searchsortedat(100:100:1000, below(251))
+2
+
+julia> searchsortedat(100:100:1000, above(249))
+3
+
+julia> searchsortedat(100:100:1000, 300)
+3
+
+julia> searchsortedat(100:100:1000, 301)
+ERROR: ArgumentError: coll does not contain x:
+coll = 100:100:1000
+x = 301
+Try `searchsortedat(coll, around(x))`
+```
+"""
+function searchsortedat(coll, app::Approach)
+    # TODO support same keywords as searchsorted and friends
+    dir = app.direction
+    x = app.value
+    if dir === strictbelow
+        i = searchsortedfirst(coll, x)
+        return i - 1
+    elseif dir === below
+        return searchsortedlast(coll, x)
+    elseif dir === around
+        ilo = searchsortedlast(coll, x)
+        if ilo < firstindex(coll)
+            return firstindex(coll)
+        end
+        ihi = min(ilo+1, lastindex(coll))
+        if norm(coll[ilo] - x) < norm(coll[ihi] - x)
+            return ilo
+        else
+            return ihi
+        end
+    elseif dir === above
+        return searchsortedfirst(coll, x)
+    elseif dir === strictabove
+        i = searchsortedlast(coll, x)
+        return i+1
+    else
+        msg = "Unreachable direction = $dir"
+        error(msg)
+    end
+end
+function searchsortedat(coll, x)
+    inds = searchsorted(coll, x)
+    if isempty(inds)
+        msg = """
+        coll does not contain x:
+        coll = $coll
+        x = $x
+        Try `searchsortedat(coll, around(x))`
+        """
+        throw(ArgumentError(msg))
+    else
+        first(inds)
+    end
 end
 
 end #module
