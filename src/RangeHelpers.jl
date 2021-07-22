@@ -420,7 +420,7 @@ end
 function asrange(arr::AbstractArray{<:Integer}; kw...)
     start = first(arr)
     if length(arr) > 1
-        step = arr[begin+1] - start
+        step = arr[firstindex(arr)+1] - start
     else
         step = oneunit(start)
     end
