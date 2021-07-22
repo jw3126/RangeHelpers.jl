@@ -232,7 +232,9 @@ end
     @test RH.searchsortedat(10:10:30, RH.around(26.0)) === 3
     @test RH.searchsortedat(10:10:30, RH.around(30)) === 3
     @test RH.searchsortedat(10:10:30, RH.around(50)) === 3
-    @test RH.searchsortedat(10:10:30, RH.around(Inf)) === 3
+    if VERSION >= v"1.6"
+        @test RH.searchsortedat(10:10:30, RH.around(Inf)) === 3
+    end
 
     for _ in 1:100
         r = sort!(randn(rand(2:10)))
