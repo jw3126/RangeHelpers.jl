@@ -221,7 +221,6 @@ end
 end
 
 @testset "searchsortedat" begin
-    @test RH.searchsortedat(10:10:30, RH.around(-Inf)) === 1
     @test RH.searchsortedat(10:10:30, RH.around(-100)) === 1
     @test RH.searchsortedat(10:10:30, RH.around(5)) === 1
     @test RH.searchsortedat(10:10:30, RH.around(10)) === 1
@@ -233,6 +232,7 @@ end
     @test RH.searchsortedat(10:10:30, RH.around(30)) === 3
     @test RH.searchsortedat(10:10:30, RH.around(50)) === 3
     if VERSION >= v"1.6"
+        @test RH.searchsortedat(10:10:30, RH.around(-Inf)) === 1
         @test RH.searchsortedat(10:10:30, RH.around(Inf)) === 3
     end
 
