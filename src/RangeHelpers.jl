@@ -672,7 +672,7 @@ true
 function samegrid(r1::AbstractRange, r2::AbstractRange; atol=0, rtol=0, kw...)::Bool
     astep1 = abs(step(r1))
     astep2 = abs(step(r2))
-    if !isapprox(astep1, astep2; atol, rtol, kw...)
+    if !isapprox(astep1, astep2; atol=atol, rtol=rtol, kw...)
         return false
     end
     dx = (1//2)*astep1 + (1//2)*astep2
@@ -680,7 +680,7 @@ function samegrid(r1::AbstractRange, r2::AbstractRange; atol=0, rtol=0, kw...)::
     s2 = element_with_largest_norm(r2)
     n = round(Int, (s2-s1)/ dx)
     s1_shifted = s1 + n * dx
-    return isapprox(s1_shifted, s2; atol, rtol, kw...)
+    return isapprox(s1_shifted, s2; atol=atol, rtol=rtol, kw...)
 end
 
 end #module
