@@ -5,6 +5,26 @@ const RH = RangeHelpers
 using Test
 
 using Test
+
+@testset "samegrid" begin
+    @test samegrid(1:2, 1:2)
+    @test samegrid(1:2, 0:-1:-10)
+    @test samegrid(Base.OneTo(10), 11.0:1.0:20.0)
+
+    @test !samegrid(1:2, 1.1:2.1)
+    @test !samegrid(1:2, 1.1:2.1, rtol=0.02)
+    @test samegrid(1:2, 1.1:2.1, rtol=0.101)
+    @test samegrid(1:2, 1.1:2.1, rtol=0.101)
+
+    @test samegrid(1:0, 1:0)
+    @test samegrid(1:0, 1:10)
+    @test !samegrid(1:0, 1.1:10)
+    @test samegrid(1:0, 1.1:10, rtol=0.2)
+    @test !samegrid(1:0, 1.0:1.1:10)
+    @test samegrid(1:0, 1.0:1.1:10, rtol=0.2)
+
+end
+
 @testset "subdivide" begin
     @test subdivide(1.0:2:9.0, 2) == 1:1:9
     @test subdivide(1.0:3, 10) === 1.0:0.1:3.0
