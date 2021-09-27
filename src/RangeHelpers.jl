@@ -151,12 +151,64 @@ end
 function range0(start, step, stop, length)
     range(start, stop=stop, step=step, length=length)
 end
+module HandleUnitStep
+    # Low level range methods, that allow remembering whether a range is a unit range
+    struct One end
+    step(r::AbstractUnitRange) = One()
+    step(r) = Base.step(r)
+    start_step_stop(start, step     , stop) = start:step:stop
+    start_step_stop(start, step::One, stop) = start:stop
 
-range1(start, step, stop, length) = Base.range(start, stop=stop, step=step, length=length)
+    # extensions
+    *(x::Any, y::Any) = Base.:(*)(x,y)
+    *(x::Any, y::One) = x
+    *(x::One, y::Any) = y
+    *(x::One, y::One) = One()
+
+    function start_step_length(start, step, length)
+        stop = start + (oneunit(start)*step)*(length-1)
+        ret = start_step_stop(start, step, stop)
+        if Base.length(ret) != length
+            msg = """
+            Bug, please open an issue at https://github.com/jw3126/RangeHelpers.jl
+            start_step_length(start, step, length)
+            start = $(start)
+            step = $(step)
+            stop = $(stop)
+            length = $(length)
+            ret = $(ret)
+            """
+            error(msg)
+        end
+        return ret
+    end
+    function step_stop_length(step,stop,length)
+        start = stop - (oneunit(stop)*step)*(length-1)
+        ret = start_step_stop(start, step, stop)
+        if Base.length(ret) != length
+            msg = """
+            Bug, please open an issue at https://github.com/jw3126/RangeHelpers.jl
+            step_stop_length(step, stop, length)
+            start= $(start)
+            step = $(step)
+            stop = $(stop)
+            length = $(length)
+            ret = $(ret)
+            """
+            error(msg)
+        end
+        ret
+    end
+end #model HandleUnitStep
+const HUS = HandleUnitStep
+
+
+range1(start, step, stop, length)          = Base.range(start, stop=stop, step=step, length=length)
 range1(start, step, stop, length::Nothing) = Base.range(start, stop=stop, step=step)
+
 range1(start::Approach, step, stop, length::Nothing) = range_start_step_stop(start,step,stop)
-range1(start, step, stop::Approach, length::Nothing) = range_start_step_stop(start,step,stop)
 range1(start, step::Approach, stop, length::Nothing) = range_start_step_stop(start,step,stop)
+range1(start, step, stop::Approach, length::Nothing) = range_start_step_stop(start,step,stop)
 
 function range_start_step_stop(start::Approach, step, stop)
     flength = floatlength(start, stop, step)
@@ -252,16 +304,16 @@ end
 prolong_pre_post(r, pre::Nothing, post::Nothing) = r
 function prolong_pre_post(r, pre::Integer, post::Nothing)
     len = length(r) + pre
-    range(stop=last(r), step=Base.step(r), length=len)
+    HUS.step_stop_length(HUS.step(r), last(r), len)
 end
 function prolong_pre_post(r, pre::Nothing, post::Integer)
     len = length(r) + post
-    range(start=first(r), step=Base.step(r), length=len)
+    HUS.start_step_length(first(r), HUS.step(r), len)
 end
 function prolong_pre_post(r, pre, post)
     len = length(r) + pre + post
     start = first(r) - pre*step(r)
-    range(start=start, step=Base.step(r), length=len)
+    HUS.start_step_length(start, HUS.step(r), len)
 end
 
 ################################################################################

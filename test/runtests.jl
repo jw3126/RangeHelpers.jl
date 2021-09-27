@@ -75,20 +75,20 @@ end
         @inferred prolong(1:2, pre=-1)
         @inferred prolong(1:2, post=2)
         @inferred prolong(1:2, post=-1)
+        @inferred prolong(1:1:2, post=-1)
 
+        @test prolong(1:1:2, pre=1) == 0:1:2
+        @test prolong(1:1:2, pre=1) === 0:1:2
         @test prolong(1:2, pre=1) == 0:2
-        @test_broken prolong(1:2, pre=1) === 0:2
+        @test prolong(1:2, pre=1) === 0:2
         @test prolong(1:2, pre=-1) == 2:2
-        @test_broken prolong(1:2, pre=-1) === 2:2
-        @test prolong(1:2, post=2) == 1:4
-        @test_broken prolong(1:2, post=2) === 1:4
-        @test prolong(1:2, post=-1) == 1:1
-        @test_broken prolong(1:2, post=-1) === 1:1
-        @test prolong(1:3, pre=1, post=-2) == 0:1
-        @test_broken prolong(1:3, pre=1, post=-2) === 0:1
+        @test prolong(1:2, pre=-1) == 2:2
+        @test prolong(1:2, pre=-1) === 2:2
+        @test prolong(1:2, post=2) === 1:4
+        @test prolong(1:2, post=-1) === 1:1
+        @test prolong(1:3, pre=1, post=-2) === 0:1
 
-        @test prolong(1:1, pre=1, post=-1) == 0:0
-        @test_broken prolong(1:1, pre=1, post=-1) === 0:0
+        @test prolong(1:1, pre=1, post=-1) === 0:0
         @test prolong(1:1, pre=-1, post=1) == 2:2
 
         @test prolong(0:0, start=around(1), stop=around(2)) == 1:2
@@ -117,7 +117,7 @@ end
         @inferred prolong(1:10, stop=around(5))
         @test prolong(1:10, stop=around(5)) == 1:5
         @test prolong(1:10.0, stop=around(5)) === 1:5.0
-        @test_broken prolong(1:10, stop=around(5)) === 1:5
+        @test prolong(1:10, stop=around(5)) == 1:5
     end
 
 end
