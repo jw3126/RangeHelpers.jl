@@ -211,18 +211,10 @@ module HandleUnitStep
         end
         ret
     end
-    start_stop_length(start::Any, stop, length) = Base.range(start, stop, length=length)
-    start_stop_length(start::One, stop, length) = Base.range(val(start) , stop, length=length)
+    start_stop_length(start::Any, stop, length) = Base.range(start, stop=stop, length=length)
+    start_stop_length(start::One, stop, length) = Base.range(val(start) , stop=stop, length=length)
 end #module HandleUnitStep
 const HUS = HandleUnitStep
-
-################################################################################
-##### patches
-################################################################################
-using .HUS: One
-
-/(x,y) = Base.:(/)(x,y)
-/(x, ::One) = x
 
 module HandleApproach
 function start_step_stop end
@@ -231,7 +223,7 @@ const HAP = HandleApproach
 
 
 range1(start, step, stop, length)          = Base.range(start, stop=stop, step=step, length=length)
-range1(start, step, stop, length::Nothing) = Base.range(start, stop=stop, step=step)
+range1(start, step, stop, length::Nothing) = HUS.start_step_stop(start, step, stop)
 
 range1(start::Approach, step, stop, length::Nothing) = HAP.start_step_stop(start,step,stop)
 range1(start, step::Approach, stop, length::Nothing) = HAP.start_step_stop(start,step,stop)
@@ -250,7 +242,7 @@ end
 
 function HAP.start_step_stop(start, step, stop::Approach)
     flength = floatlength(start, stop, step)
-    dir = if step >= 0
+    dir = if HUS.val(step) >= 0
         stop.direction
     else
         opposite(stop.direction)
@@ -278,7 +270,8 @@ end
 value(x) = x
 value(x::Approach) = x.value
 
-function floatlength(start, stop, step)
+floatlength(start, stop, step) = _floatlength(HUS.val(start), HUS.val(stop), HUS.val(step))
+function _floatlength(start, stop, step)
     1 + (value(stop) - value(start)) / value(step)
 end
 
@@ -322,7 +315,7 @@ function prolong_start_stop(r, start::Approach, stop::Nothing)
     range(start, step=HUS.step(r), stop=last(r))
 end
 function prolong_start_stop(r, start::Nothing, stop::Approach)
-    range(HUS.first(r), stop=stop, step=Base.step(r))
+    HAP.start_step_stop(HUS.first(r), HUS.step(r), stop)
 end
 function prolong_start_stop(r, start::Approach, stop::Approach)
     anchor = first(r)
@@ -330,7 +323,7 @@ function prolong_start_stop(r, start::Approach, stop::Approach)
     dir = step(r) >= 0 ? stop.direction : opposite(stop.direction)
     len1 = int(flength, dir)
     stop1 = anchor + (len1-1) * step(r)
-    return range(start=start, step=step(r), stop=stop1)
+    return HAP.start_step_stop(start, HUS.step(r), stop1)
 end
 
 prolong_pre_post(r, pre::Nothing, post::Nothing) = r

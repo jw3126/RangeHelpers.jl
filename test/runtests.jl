@@ -92,7 +92,7 @@ end
         @test prolong(1:1, pre=-1, post=1) == 2:2
 
         @test prolong(0:0, start=around(1), stop=around(2)) == 1:2
-        @test_broken prolong(0:0, start=around(1), stop=around(2)) === 1:2
+        @test prolong(0:0, start=around(1), stop=around(2)) === 1:2
 
         @test prolong(0:0, start=strictabove(10), stop=strictbelow(15)) == 11:14
         @test prolong(1e9:1e10, start=strictabove(10), stop=strictbelow(15)) == 11:14
@@ -101,6 +101,7 @@ end
 
         @test prolong(Base.OneTo(3), post=2) == Base.OneTo(5)
         @test prolong(Base.OneTo(3), post=2) === Base.OneTo(5)
+        @test prolong(Base.OneTo(3), stop=around(2)) === Base.OneTo(2)
     end
 
     @testset "anchorrange" begin
