@@ -28,6 +28,6 @@ julia> range(start=10, stop=above(121.7), step=25)  # exact step, but allow bigg
 10:25:135
 
 julia> anchorrange(42, start=around(10), step=25, stop=around(121.7)) # make sure 42 is on the grid
-17.0:25.0:117.0
+17:25:117
 ```
 See [the documentation](https://jw3126.github.io/RangeHelpers.jl/dev/) for even more ways to make ranges.

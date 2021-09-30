@@ -19,6 +19,7 @@ export samegrid
     #read(path, String)
 end RangeHelpers
 
+
 ################################################################################
 ##### range
 ################################################################################
@@ -154,20 +155,31 @@ end
 module HandleUnitStep
     # Low level range methods, that allow remembering whether a range is a unit range
     struct One end
-    step(r::AbstractUnitRange) = One()
-    step(r) = Base.step(r)
-    start_step_stop(start, step     , stop) = start:step:stop
-    start_step_stop(start, step::One, stop) = start:stop
 
     # extensions
+    first(x) = Base.first(x)
+    first(x::Base.OneTo) = One()
+
+    step(r::AbstractUnitRange) = One()
+    step(r) = Base.step(r)
+
     *(x::Any, y::Any) = Base.:(*)(x,y)
     *(x::Any, y::One) = x
     *(x::One, y::Any) = y
     *(x::One, y::One) = One()
+    val(::One) = true
+    val(x)     = x
 
-    function start_step_length(start, step, length)
-        stop = start + (oneunit(start)*step)*(length-1)
-        ret = start_step_stop(start, step, stop)
+    start_step_stop(start::Any, step::Any, stop)      = start:step:stop
+    start_step_stop(start::Any, step::One, stop)      = start:stop
+    start_step_stop(start::One, step::One, stop) = Base.OneTo(stop)
+
+    start_step_length(start::Any, step::Any, length) = Base.range(start, step=step, length=length)
+    start_step_length(start::One, step::Any, length) = Base.range(val(start), step=step, length=length)
+    start_step_length(start::One, step::One, length) = Base.OneTo(length)
+    start_step_length(start::Any, step::One, length) = begin
+        stop = start + oneunit(start)*(length-1)
+        ret  = start_step_stop(start, step, stop)
         if Base.length(ret) != length
             msg = """
             Bug, please open an issue at https://github.com/jw3126/RangeHelpers.jl
@@ -199,29 +211,44 @@ module HandleUnitStep
         end
         ret
     end
-end #model HandleUnitStep
+    start_stop_length(start::Any, stop, length) = Base.range(start, stop, length=length)
+    start_stop_length(start::One, stop, length) = Base.range(val(start) , stop, length=length)
+end #module HandleUnitStep
 const HUS = HandleUnitStep
+
+################################################################################
+##### patches
+################################################################################
+using .HUS: One
+
+/(x,y) = Base.:(/)(x,y)
+/(x, ::One) = x
+
+module HandleApproach
+function start_step_stop end
+end
+const HAP = HandleApproach
 
 
 range1(start, step, stop, length)          = Base.range(start, stop=stop, step=step, length=length)
 range1(start, step, stop, length::Nothing) = Base.range(start, stop=stop, step=step)
 
-range1(start::Approach, step, stop, length::Nothing) = range_start_step_stop(start,step,stop)
-range1(start, step::Approach, stop, length::Nothing) = range_start_step_stop(start,step,stop)
-range1(start, step, stop::Approach, length::Nothing) = range_start_step_stop(start,step,stop)
+range1(start::Approach, step, stop, length::Nothing) = HAP.start_step_stop(start,step,stop)
+range1(start, step::Approach, stop, length::Nothing) = HAP.start_step_stop(start,step,stop)
+range1(start, step, stop::Approach, length::Nothing) = HAP.start_step_stop(start,step,stop)
 
-function range_start_step_stop(start::Approach, step, stop)
+function HAP.start_step_stop(start::Approach, step, stop)
     flength = floatlength(start, stop, step)
-    dir = if step >= 0
+    dir = if HUS.val(step) >= 0
         opposite(start.direction)
     else
         start.direction
     end
     length = int(flength, dir)
-    range(step=step, stop=stop, length=length)
+    ret = HUS.step_stop_length(step, stop, length)
 end
 
-function range_start_step_stop(start, step, stop::Approach)
+function HAP.start_step_stop(start, step, stop::Approach)
     flength = floatlength(start, stop, step)
     dir = if step >= 0
         stop.direction
@@ -229,10 +256,11 @@ function range_start_step_stop(start, step, stop::Approach)
         opposite(stop.direction)
     end
     length = int(flength, dir)
-    range(start=start, step=step, length=length)
+    ret = HUS.start_step_length(start, step, length)
+    #@show start step stop length ret
 end
 
-function range_start_step_stop(start, step::Approach, stop)
+function HAP.start_step_stop(start, step::Approach, stop)
     flength = floatlength(start, stop, step)
     dir = if step.value >= 0
         opposite(step.direction)
@@ -240,7 +268,11 @@ function range_start_step_stop(start, step::Approach, stop)
         step.direction
     end
     length = int(flength, dir)
-    range(start=start, stop=stop, length=length)
+    ret = HUS.start_stop_length(start, stop, length)
+    @assert start == first(ret)
+    @assert stop == last(ret)
+    #@show ret start step stop typeof(start) typeof(step) typeof(stop)
+    ret
 end
 
 value(x) = x
@@ -287,10 +319,10 @@ function prolong_start_stop(r, start::Nothing, stop::Nothing)
     r
 end
 function prolong_start_stop(r, start::Approach, stop::Nothing)
-    range(start, step=Base.step(r), stop=last(r))
+    range(start, step=HUS.step(r), stop=last(r))
 end
 function prolong_start_stop(r, start::Nothing, stop::Approach)
-    range(first(r), stop=stop, step=Base.step(r))
+    range(HUS.first(r), stop=stop, step=Base.step(r))
 end
 function prolong_start_stop(r, start::Approach, stop::Approach)
     anchor = first(r)
@@ -308,7 +340,7 @@ function prolong_pre_post(r, pre::Integer, post::Nothing)
 end
 function prolong_pre_post(r, pre::Nothing, post::Integer)
     len = length(r) + post
-    HUS.start_step_length(first(r), HUS.step(r), len)
+    HUS.start_step_length(HUS.first(r), HUS.step(r), len)
 end
 function prolong_pre_post(r, pre, post)
     len = length(r) + pre + post
@@ -397,25 +429,25 @@ function _symrange(center, start::Nothing, step, stop::Nothing, length)
 end
 
 function _symrange(center, start::Approach, step, stop::Nothing, length::Nothing)
-    r = range_start_step_stop(start, step/2, center)
+    r = HAP.start_step_stop(start, step/2, center)
     start_ = if last(r) == center
         first(r)
     else
         last(r)
     end
     stop_ = around(2*center-start_)
-    return range_start_step_stop(start_, step, stop_)
+    return HAP.start_step_stop(start_, step, stop_)
 end
 
 function _symrange(center, start::Nothing, step, stop::Approach, length::Nothing)
-    r = range_start_step_stop(center, step/2, stop)
+    r = HAP.start_step_stop(center, step/2, stop)
     stop_ = if first(r) == center
         last(r)
     else
         first(r)
     end
     start_ = around(2*center-stop_)
-    return range_start_step_stop(start_, step, stop_)
+    return HAP.start_step_stop(start_, step, stop_)
 end
 
 ################################################################################

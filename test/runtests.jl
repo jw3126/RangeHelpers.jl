@@ -98,7 +98,11 @@ end
         @test prolong(1e9:1e10, start=strictabove(10), stop=strictbelow(15)) == 11:14
         @test prolong(1e9:1e10, start=below(10), stop=strictbelow(15)) == 10:14
         @test prolong(1e9:1e10, start=below(10), stop=around(15.1)) == 10:15
+
+        @test prolong(Base.OneTo(3), post=2) == Base.OneTo(5)
+        @test prolong(Base.OneTo(3), post=2) === Base.OneTo(5)
     end
+
     @testset "anchorrange" begin
         @inferred anchorrange(15.5, start=above(11), step=2, stop=below(15))
         @test anchorrange(15.5, start=above(11), step=2, stop=below(15)) === 11.5:2.0:13.5
@@ -107,10 +111,10 @@ end
     @testset "start" begin
         @inferred prolong(1:10, start=around(5))
         @test prolong(1:10, start=around(5)) == 5:10
-        @test_broken prolong(1:10, start=around(5)) === 5:10
+        @test prolong(1:10, start=around(5)) === 5:10
 
         @test prolong(1:10, start=below(-2)) == -2:10
-        @test_broken prolong(1:10, start=below(-2)) === -2:10
+        @test prolong(1:10, start=below(-2)) === -2:10
     end
 
     @testset "stop" begin
@@ -139,21 +143,21 @@ end
     @testset "start" begin
         @test range(strictbelow(1), 3.1, step = 2) ≈ -0.9:2.0:3.1
         @test range(below(1), 3.1, step = 2) ≈ -0.9:2.0:3.1
-        @test range(around(1), 3.1, step = 2) === 1.1:2.0:3.1
-        @test range(above(1), 3.1, step = 2) === 1.1:2.0:3.1
-        @test range(strictabove(1), 3.1, step = 2) === 1.1:2.0:3.1
+        @test range(around(1), 3.1, step = 2)                     === 1.1:2.0:3.1
+        @test range(above(1), 3.1, step = 2)                      === 1.1:2.0:3.1
+        @test range(strictabove(1), 3.1, step = 2)                === 1.1:2.0:3.1
 
-        @test range(strictbelow(2), 0, step=-1) === 1.0:-1.0:0.0
-        @test range(below(2), 0, step=-1) === 2.0:-1.0:0.0
-        @test range(around(2), 0, step=-1) === 2.0:-1.0:0.0
-        @test range(above(2), 0, step=-1) === 2.0:-1.0:0.0
-        @test range(strictabove(2), 0, step=-1) === 3.0:-1.0:0.0
+        @test range(strictbelow(2), 0, step=-1)                   === 1:-1:0
+        @test range(below(2), 0, step=-1)                         === 2:-1:0
+        @test range(around(2), 0, step=-1)                        === 2:-1:0
+        @test range(above(2), 0, step=-1)                         === 2:-1:0
+        @test range(strictabove(2), 0, step=-1)                   === 3:-1:0
 
-        @test range(strictbelow(2.1), 0, step=-1) === 2.0:-1.0:0.0
-        @test range(below(2.1), 0, step=-1) === 2.0:-1.0:0.0
-        @test range(around(2.1), 0, step=-1) === 2.0:-1.0:0.0
-        @test range(above(2.1), 0, step=-1) === 3.0:-1.0:0.0
-        @test range(strictabove(2.1), 0, step=-1) === 3.0:-1.0:0.0
+        @test range(strictbelow(2.1), 0, step=-1)                 === 2:-1:0
+        @test range(below(2.1), 0, step=-1)                       === 2:-1:0
+        @test range(around(2.1), 0, step=-1)                      === 2:-1:0
+        @test range(above(2.1), 0, step=-1)                       === 3:-1:0
+        @test range(strictabove(2.1), 0, step=-1)                 === 3:-1:0
     end
 
     @testset "stop" begin
