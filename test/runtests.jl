@@ -22,7 +22,6 @@ using Test
     @test samegrid(1:0, 1.1:10, rtol=0.2)
     @test !samegrid(1:0, 1.0:1.1:10)
     @test samegrid(1:0, 1.0:1.1:10, rtol=0.2)
-
 end
 
 @testset "subdivide" begin
