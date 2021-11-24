@@ -66,6 +66,9 @@ end
 
     r = @inferred symrange(stop=strictabove(-2), step=-1)
     @test r === 1.5:-1.0:-1.5
+
+    r = @inferred symrange(step=2.5f0, length=106)
+    @test eltype(r) === Float32
 end
 
 @testset "prolong" begin

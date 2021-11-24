@@ -410,7 +410,7 @@ function _symrange(center, start, step, stop, length)
 end
 
 function _symrange(center, start::Nothing, step, stop::Nothing, length)
-    c = float(something(center, zero(step)))
+    c = float(center*one(step))
     if isodd(length)
         hl = Int((length - 1)/2)
         anchorrange(c, pre=hl, post=hl, step=step)
