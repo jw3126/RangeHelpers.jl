@@ -1,7 +1,7 @@
 name = "RangeHelpers"
 uuid = "3a07dd3d-1c52-4395-8858-40c6328157db"
 authors = ["Jan Weidner <jw3126@gmail.com> and contributors"]
-version = "0.1.7"
+version = "0.1.8"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
