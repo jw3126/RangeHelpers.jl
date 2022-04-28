@@ -4,8 +4,6 @@ using RangeHelpers
 const RH = RangeHelpers
 using Test
 
-using Test
-
 @testset "samegrid" begin
     @test samegrid(1:2, 1:2)
     @test samegrid(1:2, 0:-1:-10)
@@ -308,6 +306,32 @@ end
     @test RH.searchsortedat(coll, strictabove(1)) === 5
     @test RH.searchsortedat(coll, strictbelow(1)) === 1
 end
+@testset "indexof" begin
+    @test RH.indexof(1:10, 3) == 3
+    @test RH.indexof(1:10, 3.0) == 3
+    @test RH.indexof(1:10, 1) == 1
+    @test RH.indexof(1:10, 10) == 10
+    @test_throws Exception RH.indexof(1:10, 9.9999)
+    @test_throws BoundsError RH.indexof(1:10, 0)
+    @test_throws BoundsError RH.indexof(1:10, 11)
+    
+    @inferred RH.indexof(1:10, 3) == 3
+    @inferred RH.indexof(1:10, 3.0) == 3
+    @inferred RH.indexof(1:1.0:10.0, 3.0) == 3
+    
+    for _ in 1:100
+        r = range(
+            start = 100randn(),
+            length = rand(2:1000),
+            step = 10randn(),
+        )
+        i = rand(eachindex(r))
+        x = r[i]
+        @test RH.indexof(r, x) == i
+        @test_throws Exception RH.indexof(r, x + rand()*step(r))
+    end
+end
+
 
 @testset "doctest" begin
     import Documenter

@@ -11,6 +11,7 @@ export binwalls, bincenters
 export subdivide
 export searchsortedat
 export samegrid
+export indexof
 
 # Use README as docstring
 @doc let path = joinpath(dirname(@__DIR__), "README.md")
@@ -24,7 +25,7 @@ end RangeHelpers
 ##### range
 ################################################################################
 @enum Direction strictbelow below around above strictabove
-
+###
 (direction::Direction)(value) = Approach(value, direction)
 function direction_string(direction::Direction)
     if direction === strictbelow
@@ -759,5 +760,33 @@ function samegrid(r1::AbstractRange, r2::AbstractRange; atol=0, rtol=0, kw...)::
     s1_shifted = s1 + n * dx
     return isapprox(s1_shifted, s2; atol=atol, rtol=rtol, kw...)
 end
+
+
+################################################################################
+#### indexof
+################################################################################
+"""
+    i = indexof(r::AbstractRange, x)
+
+Return `i` such that `r[i] == x` or throw an error if that is not possible.
+"""
+function indexof(r::AbstractRange, x)
+    i_real = ((x - first(r)) / step(r)) + firstindex(r)
+    I = eltype(eachindex(r))
+    i = round(I, i_real)
+    @boundscheck begin
+        checkbounds(r, i)
+        if r[i] != x
+            msg = """
+            Element not in range
+            r = $r
+            x = $x
+            """
+            throw(ArgumentError(msg))
+        end
+    end
+    return i
+end
+
 
 end #module
