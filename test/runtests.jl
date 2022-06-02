@@ -243,6 +243,13 @@ end
     @test RH.bincenters(1:2:9) == [2,4,6,8]
     @inferred RH.bincenters(1:3)
     @inferred RH.binwalls(1:3)
+
+    @test_throws ArgumentError bincenters(Int[])
+    @test bincenters([1]) == Float64[]
+    @test bincenters([10,20]) ≈ Float64[15]
+    @test eltype(bincenters(Float32[1])) === Float32
+    @test eltype(bincenters(Float64[1])) === Float64
+    @test bincenters([0,1,2,4]) ≈ [0.5, 1.5, 3]
 end
 
 @testset "searchsortedat" begin
@@ -250,6 +257,8 @@ end
     @test RH.searchsortedat(10:10:30, RH.around(5)) === 1
     @test RH.searchsortedat(10:10:30, RH.around(10)) === 1
     @test RH.searchsortedat(10:10:30, RH.around(14)) === 1
+    @test RH.searchsortedat(10:10:30, RH.around(14.99999999)) === 1
+    @test RH.searchsortedat(10:10:30, RH.around(15.00000001)) === 2
     @test RH.searchsortedat(10:10:30, RH.around(16.0)) === 2
     @test RH.searchsortedat(10:10:30, RH.around(20.0)) === 2
     @test RH.searchsortedat(10:10:30, RH.around(24.0)) === 2

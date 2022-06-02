@@ -563,6 +563,21 @@ function bincenters(r::AbstractRange)::AbstractRange
     return binwalls(r, first=false, last=false)
 end
 
+function bincenters(v::AbstractVector)
+    if isempty(v)
+        throw(ArgumentError("Cannot compute bincenters of empty vector."))
+    end
+    Base.require_one_based_indexing(v)
+    T = float(eltype(v))
+    ret = similar(v, T, length(v)-1)
+    half = T(1/2)
+    for i in 1:length(ret)
+        @inbounds m = half*(T(v[i]) + T(v[i+1]))
+        @inbounds ret[i] = m
+    end
+    return ret
+end
+
 ################################################################################
 ##### subdivide
 ################################################################################
