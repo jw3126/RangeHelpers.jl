@@ -218,7 +218,7 @@ end #module HandleUnitStep
 const HUS = HandleUnitStep
 
 module HandleApproach
-function start_step_stop end
+    function start_step_stop end
 end
 const HAP = HandleApproach
 
@@ -563,11 +563,18 @@ function bincenters(r::AbstractRange)::AbstractRange
     return binwalls(r, first=false, last=false)
 end
 
+if isdefined(Base, :require_one_based_indexing)
+    using Base: require_one_based_indexing
+else
+    function require_one_based_indexing(v)
+        (firstindex(v) == one(eltype(v))) || throw(ArgumentError("First index must be one."))
+    end
+end
 function bincenters(v::AbstractVector)
     if isempty(v)
         throw(ArgumentError("Cannot compute bincenters of empty vector."))
     end
-    Base.require_one_based_indexing(v)
+    require_one_based_indexing(v)
     T = float(eltype(v))
     ret = similar(v, T, length(v)-1)
     half = T(1/2)
