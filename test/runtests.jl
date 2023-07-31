@@ -347,5 +347,11 @@ end
     Documenter.doctest(RangeHelpers)
 end
 
+@testset "Dates" begin
+    t1 = DateTime(1988,1,1)
+    t2 = DateTime(2023,12,31)
+    delt = Dates.Day(3)
+    range(start = t1, stop = strictbelow(t2), step = delt) |> last == DateTime(2023,12,29)
+end
 
 end#module
