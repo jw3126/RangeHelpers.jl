@@ -3,6 +3,7 @@ using RangeHelpers: range
 using RangeHelpers
 const RH = RangeHelpers
 using Test
+using Dates
 
 @testset "samegrid" begin
     @test samegrid(1:2, 1:2)
@@ -351,7 +352,8 @@ end
     t1 = DateTime(1988,1,1)
     t2 = DateTime(2023,12,31)
     delt = Dates.Day(3)
-    range(start = t1, stop = strictbelow(t2), step = delt) |> last == DateTime(2023,12,29)
+    @test range(start = t1, stop = strictbelow(t2), step = delt) |> last == DateTime(2023,12,29)
+    @test prolong(t1:delt:t2,post = 1) |> last == DateTime(2024,1,1)
 end
 
 end#module
