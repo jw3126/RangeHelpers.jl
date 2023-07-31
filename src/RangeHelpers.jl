@@ -232,7 +232,8 @@ range1(start, step, stop::Approach, length::Nothing) = HAP.start_step_stop(start
 
 function HAP.start_step_stop(start::Approach, step, stop)
     flength = floatlength(start, stop, step)
-    dir = if HUS.val(step) >= 0
+    _step = HUS.val(step)
+    dir = if _step >= zero(_step)
         opposite(start.direction)
     else
         start.direction
@@ -243,7 +244,8 @@ end
 
 function HAP.start_step_stop(start, step, stop::Approach)
     flength = floatlength(start, stop, step)
-    dir = if HUS.val(step) >= 0
+    _step = HUS.val(step)
+    dir = if _step >= zero(_step)
         stop.direction
     else
         opposite(stop.direction)
@@ -255,7 +257,7 @@ end
 
 function HAP.start_step_stop(start, step::Approach, stop)
     flength = floatlength(start, stop, step)
-    dir = if step.value >= 0
+    dir = if step.value >= zero(step.value)
         opposite(step.direction)
     else
         step.direction
@@ -321,7 +323,7 @@ end
 function prolong_start_stop(r, start::Approach, stop::Approach)
     anchor = first(r)
     flength = floatlength(anchor, stop, step(r))
-    dir = step(r) >= 0 ? stop.direction : opposite(stop.direction)
+    dir = step(r) >= zero(step(r)) ? stop.direction : opposite(stop.direction)
     len1 = int(flength, dir)
     stop1 = anchor + (len1-1) * step(r)
     return HAP.start_step_stop(start, HUS.step(r), stop1)
