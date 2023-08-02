@@ -65,10 +65,10 @@ function preprocess(fx::Base.Fix2{F,T}) where {F,T}
     return Approach{T}(fx.x,d)
 end
 
-direction_pred(f::typeof(Base.:<)) = below
-direction_pred(f::typeof(Base.:≤)) = strictbelow
-direction_pred(f::typeof(Base.:>)) = above
-direction_pred(f::typeof(Base.:≥)) = strictabove
+direction_pred(f::typeof(Base.:<)) = strictbelow
+direction_pred(f::typeof(Base.:≤)) = below
+direction_pred(f::typeof(Base.:>)) = strictabove
+direction_pred(f::typeof(Base.:≥)) = above
 
 function opposite(direction::Direction)::Direction
     if direction === strictbelow
