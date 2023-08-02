@@ -96,6 +96,7 @@ end
         @test prolong(0:0, start=around(1), stop=around(2)) === 1:2
 
         @test prolong(0:0, start=strictabove(10), stop=strictbelow(15)) == 11:14
+        @test prolong(0:0, start = ≥(10), stop = ≤(15)) == 11:14
         @test prolong(1e9:1e10, start=strictabove(10), stop=strictbelow(15)) == 11:14
         @test prolong(1e9:1e10, start=below(10), stop=strictbelow(15)) == 10:14
         @test prolong(1e9:1e10, start=below(10), stop=around(15.1)) == 10:15
@@ -108,6 +109,7 @@ end
     @testset "anchorrange" begin
         @inferred anchorrange(15.5, start=above(11), step=2, stop=below(15))
         @test anchorrange(15.5, start=above(11), step=2, stop=below(15)) === 11.5:2.0:13.5
+        @test anchorrange(15.5, start= >(11), step=2, stop= <(15)) === 11.5:2.0:13.5
     end
 
     @testset "start" begin
