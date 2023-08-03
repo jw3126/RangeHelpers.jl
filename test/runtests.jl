@@ -66,6 +66,9 @@ end
     r = @inferred symrange(stop=strictabove(-2), step=-1)
     @test r === 1.5:-1.0:-1.5
 
+    r = @inferred symrange(stop = >(-2), step=-1)
+    @test r === 1.5:-1.0:-1.5
+
     r = @inferred symrange(step=2.5f0, length=106)
     @test eltype(r) === Float32
 end
@@ -96,6 +99,7 @@ end
         @test prolong(0:0, start=around(1), stop=around(2)) === 1:2
 
         @test prolong(0:0, start=strictabove(10), stop=strictbelow(15)) == 11:14
+        @test prolong(0:0, start = >(10), stop = <(15)) == 11:14
         @test prolong(1e9:1e10, start=strictabove(10), stop=strictbelow(15)) == 11:14
         @test prolong(1e9:1e10, start=below(10), stop=strictbelow(15)) == 10:14
         @test prolong(1e9:1e10, start=below(10), stop=around(15.1)) == 10:15
@@ -108,6 +112,7 @@ end
     @testset "anchorrange" begin
         @inferred anchorrange(15.5, start=above(11), step=2, stop=below(15))
         @test anchorrange(15.5, start=above(11), step=2, stop=below(15)) === 11.5:2.0:13.5
+        @test anchorrange(15.5, start= >=(11), step=2, stop= <=(15)) === 11.5:2.0:13.5
     end
 
     @testset "start" begin
@@ -140,6 +145,7 @@ end
         @test range(1, 2, step = 0.5) == [1, 1.5, 2]
         @test range(1, stop = 2, step = 0.5) === 1.0:0.5:2.0
         @test range(start=1, stop = 2, step = 0.5) === 1.0:0.5:2.0
+        @test range(start= ==(1), stop = ==(2), step = ==(0.5))  === 1.0:0.5:2.0
     end
 
     @testset "start" begin
@@ -160,6 +166,13 @@ end
         @test range(around(2.1), 0, step=-1)                      === 2:-1:0
         @test range(above(2.1), 0, step=-1)                       === 3:-1:0
         @test range(strictabove(2.1), 0, step=-1)                 === 3:-1:0
+
+        @test range(<(2.1), 0, step=-1)                           === 2:-1:0
+        @test range(<=(2.1), 0, step=-1)                          === 2:-1:0
+        @test range(≤(2.1), 0, step=-1)                           === 2:-1:0
+        @test range(>=(2.1), 0, step=-1)                          === 3:-1:0
+        @test range(≥(2.1), 0, step=-1)                           === 3:-1:0
+        @test range(>(2.1), 0, step=-1)                           === 3:-1:0
     end
 
     @testset "stop" begin
@@ -180,6 +193,13 @@ end
         @test range(2.1, around(0), step=-1) === 2.1:-1.0:0.1
         @test range(2.1, above(0), step=-1) === 2.1:-1.0:0.1
         @test range(2.1, strictabove(0), step=-1) === 2.1:-1.0:0.1
+
+        @test range(2.1, <(0), step=-1) === 2.1:-1.0:-0.9
+        @test range(2.1, <=(0), step=-1) === 2.1:-1.0:-0.9
+        @test range(2.1, ≤(0), step=-1) === 2.1:-1.0:-0.9
+        @test range(2.1, >=(0), step=-1) === 2.1:-1.0:0.1
+        @test range(2.1, ≥(0), step=-1) === 2.1:-1.0:0.1
+        @test range(2.1, >(0), step=-1) === 2.1:-1.0:0.1
     end
 
     @testset "step" begin
@@ -202,6 +222,13 @@ end
         @test range(2, 0, step=around(-1)) === 2.0:-1.0:0.0
         @test range(2, 0, step=above(-1)) === 2.0:-1.0:0.0
         @test range(2, 0, step=strictabove(-1)) === range(2, stop=0, length=4)
+
+        @test range(2, 0, step= <(-1)) === 2.0:-2.0:0.0
+        @test range(2, 0, step= <=(-1)) === 2.0:-1.0:0.0
+        @test range(2, 0, step= ≤(-1)) === 2.0:-1.0:0.0
+        @test range(2, 0, step= >=(-1)) === 2.0:-1.0:0.0
+        @test range(2, 0, step= ≥(-1)) === 2.0:-1.0:0.0
+        @test range(2, 0, step= >(-1)) === range(2, stop=0, length=4)
     end
 end
 

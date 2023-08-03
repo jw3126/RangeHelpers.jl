@@ -56,6 +56,22 @@ function Base.show(io::IO, o::Approach)
     print(io, direction_string(direction), "(", o.value, ")")
 end
 
+preprocess(start,step,stop) = preprocess(start),preprocess(step),preprocess(stop)
+
+preprocess(x) = x
+
+preprocess(fx::Base.Fix2{typeof(==)}) = fx.x
+
+function preprocess(fx::Base.Fix2{F,T}) where {F,T}
+    d = direction_pred(fx.f)
+    return Approach{T}(fx.x,d)
+end
+
+direction_pred(f::typeof(<)) = strictbelow
+direction_pred(f::typeof(≤)) = below
+direction_pred(f::typeof(>)) = strictabove
+direction_pred(f::typeof(≥)) = above
+
 function opposite(direction::Direction)::Direction
     if direction === strictbelow
         strictabove
@@ -134,15 +150,18 @@ See also the docs of `Base.range`.
 function range end
 
 function range(;start=nothing, stop=nothing, length=nothing, step=nothing)
-    range0(start, step, stop, length)
+    _start,_step,_stop = preprocess(start,step,stop)
+    range0(_start, _step, _stop, length)
 end
 
 function range(start; stop=nothing, length=nothing, step=nothing)
-    range1(start, step, stop, length)
+    _start,_step,_stop = preprocess(start,step,stop)
+    range1(_start, _step, _stop, length)
 end
 
 function range(start, stop; length=nothing, step=nothing)
-    range1(start, step, stop, length)
+    _start,_step,_stop = preprocess(start,step,stop)
+    range1(_start, _step, _stop, length)
 end
 
 function range0(start::Nothing, step, stop, length)
@@ -306,7 +325,8 @@ julia> prolong(r, start=below(0.4), stop=around(4.1))
 ```
 """
 function prolong(r::AbstractRange;start=nothing, stop=nothing, pre=nothing, post=nothing)
-    r2 = prolong_start_stop(r, start, stop)
+    _start,_,_stop = preprocess(start,nothing,stop)
+    r2 = prolong_start_stop(r, _start, _stop)
     r3 = prolong_pre_post(r2, pre, post)
     return r3
 end
@@ -361,7 +381,8 @@ julia> anchorrange(15.5, start=above(11), step=2, stop=below(15))
 ```
 """
 function anchorrange(anchor; step, kw...)
-    r0 = anchor:step:anchor
+    _step = preprocess(step)
+    r0 = anchor:_step:anchor
     return prolong(r0; kw...)
 end
 
@@ -397,7 +418,8 @@ julia> symrange(stop=around(4.1), step=2, center=1)
 ```
 """
 function symrange(;center=0, start=nothing, step=nothing, stop=nothing, length=nothing)
-    _symrange(center, start, step, stop, length)
+    _start, _step, _stop = preprocess(start,step,stop)
+    _symrange(center, _start, _step, _stop, length)
 end
 
 function _symrange(center, start, step, stop, length)
