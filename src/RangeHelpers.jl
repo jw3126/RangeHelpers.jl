@@ -60,6 +60,8 @@ preprocess(start,step,stop) = preprocess(start),preprocess(step),preprocess(stop
 
 preprocess(x) = x
 
+preprocess(fx::Base.Fix2{typeof(==)}) = fx.x
+
 function preprocess(fx::Base.Fix2{F,T}) where {F,T}
     d = direction_pred(fx.f)
     return Approach{T}(fx.x,d)
