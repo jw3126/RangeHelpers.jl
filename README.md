@@ -18,16 +18,16 @@ julia> using RangeHelpers: range
 
 julia> using RangeHelpers
 
-julia> range(start=10, stop=121.7, step=around(25)) # compromise on step
+julia> range(start = 10, stop = 121.7, step = around(25)) # compromise on step
 10.0:27.925:121.7
 
-julia> range(start=10, stop=121.7, step=below(25))  # compromise step at most 25
+julia> range(start = 10, stop = 121.7, step = ≤(25))  # compromise step at most 25
 10.0:22.34:121.7
 
-julia> range(start=10, stop=above(121.7), step=25)  # exact step, but allow bigger endpoint
+julia> range(start = 10, stop = ≥(121.7), step = 25)  # exact step, but allow bigger endpoint
 10:25:135
 
-julia> anchorrange(42, start=around(10), step=25, stop=around(121.7)) # make sure 42 is on the grid
+julia> anchorrange(42, start = around(10), step = 25, stop = around(121.7)) # make sure 42 is on the grid
 17:25:117
 ```
 See [the documentation](https://jw3126.github.io/RangeHelpers.jl/dev/) for even more ways to make ranges.
