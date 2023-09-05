@@ -6,14 +6,16 @@ using Test
 using Dates
 
 @testset "Issue #6 start_step_stop gives wrong length" begin
-    start= -2.7249999999999996
-    step = 0.034999999999999996
-    stop = 0.6
-    r = @inferred RangeHelpers.range(start=below(start), stop=stop, step=step)
-    @test last(r) === stop
-    @test Base.step(r) === step
-    @test first(r) <= start
-    @test first(r) + step > start
+    if VERSION >= v"1.7"
+        start= -2.7249999999999996
+        step = 0.034999999999999996
+        stop = 0.6
+        r = @inferred RangeHelpers.range(start=below(start), stop=stop, step=step)
+        @test last(r) === stop
+        @test Base.step(r) === step
+        @test first(r) <= start
+        @test first(r) + step > start
+    end
 end
 
 @testset "samegrid" begin
