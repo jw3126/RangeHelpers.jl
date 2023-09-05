@@ -217,19 +217,11 @@ module HandleUnitStep
     function step_stop_length(step,stop,length)
         start = stop - (oneunit(stop)*step)*(length-1)
         ret = start_step_stop(start, step, stop)
-        if Base.length(ret) != length
-            msg = """
-            Bug, please report the call that results in this error at https://github.com/jw3126/RangeHelpers.jl/issues/6
-            step_stop_length(step, stop, length)
-            start= $(start)
-            step = $(step)
-            stop = $(stop)
-            length = $(length)
-            ret = $(ret)
-            """
-            error(msg)
+        if Base.length(ret) == length
+            ret
+        else
+            Base.range(;step,stop,length)
         end
-        ret
     end
     start_stop_length(start::Any, stop, length) = Base.range(start, stop=stop, length=length)
     start_stop_length(start::One, stop, length) = Base.range(val(start) , stop=stop, length=length)
