@@ -5,6 +5,18 @@ const RH = RangeHelpers
 using Test
 using Dates
 
+@testset "Issue #6 start_step_stop gives wrong length" begin
+    @test_broken try
+        start= -2.7249999999999996
+        step = 0.034999999999999996
+        stop = 0.6
+        RangeHelpers.range(start=below(start), stop=stop, step=step)
+        true
+    catch err
+        false
+    end
+end
+
 @testset "samegrid" begin
     @test samegrid(1:2, 1:2)
     @test samegrid(1:2, 0:-1:-10)

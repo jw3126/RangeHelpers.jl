@@ -219,7 +219,7 @@ module HandleUnitStep
         ret = start_step_stop(start, step, stop)
         if Base.length(ret) != length
             msg = """
-            Bug, please open an issue at https://github.com/jw3126/RangeHelpers.jl
+            Bug, please report the call that results in this error at https://github.com/jw3126/RangeHelpers.jl/issues/6
             step_stop_length(step, stop, length)
             start= $(start)
             step = $(step)
