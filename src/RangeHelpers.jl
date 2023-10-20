@@ -730,6 +730,10 @@ function searchsortedat(coll, app::Approach)
         error(msg)
     end
 end
+function searchsortedat(coll, x::Base.Fix2)
+    searchsortedat(coll, preprocess(x))
+end
+
 function searchsortedat(coll, x)
     inds = searchsorted(coll, x)
     if isempty(inds)
