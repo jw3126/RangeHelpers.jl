@@ -320,6 +320,12 @@ end
         iab  = RH.searchsortedat(r, RH.above(x))
         isab = RH.searchsortedat(r, RH.strictabove(x))
         @test iar-1 <= isbe == ibe <= iar <= iab == isab <= isbe + 1
+
+        @test isbe == RH.searchsortedat(r, <(x))
+        @test ibe == RH.searchsortedat(r, <=(x))
+        @test iab == RH.searchsortedat(r, >=(x))
+        @test isab == RH.searchsortedat(r, >(x))
+
         @test_throws ArgumentError RH.searchsortedat(r, x)
         @test iar in eachindex(r)
         if ibe < firstindex(r)
@@ -341,6 +347,7 @@ end
         @test RH.searchsortedat(r, RH.above(x)) == i
         @test RH.searchsortedat(r, RH.strictabove(x)) == i+1
         @test RH.searchsortedat(r, x) == i
+        @test RH.searchsortedat(r, ==(x)) == i
     end
     @inferred RH.searchsortedat(10:10:30, RH.around(4))
     @inferred RH.searchsortedat(10:10:30, RH.around(4.4))
