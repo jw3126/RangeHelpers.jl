@@ -560,7 +560,16 @@ function binwalls(r::AbstractRange; first=true, last=true)::AbstractRange
         Base.last(r) - h
     end
     len = length(r) + first + last - 1
-    return Base.range(start, stop=stop, length = len)
+    len2 = max(len, 2)
+    ret = Base.range(start, stop=stop, length = len2)
+    T = typeof(ret)
+    if len == len2
+        ret
+    elseif isempty(r)
+        convert(T, Base.range(start, step=step(r), length = 0))
+    else
+        convert(T, Base.range(start, step=step(r), length = len))
+    end::T
 end
 
 """

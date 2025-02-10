@@ -279,6 +279,14 @@ end
         @test r ≈ RH.bincenters(RH.binwalls(r))
         @test r ≈ RH.binwalls(RH.bincenters(r))
     end
+
+    # edge cases
+    @test isempty(RH.bincenters(range(0,length=0,step=10)))
+    @test isempty(RH.bincenters(range(0,length=1,step=10)))
+    @test RH.binwalls(range(0,length=1,step=10)) == -5:10:5
+    @test isempty(RH.binwalls(range(0,length=0,step=10)))
+    @test RH.bincenters(range(1,3,length=2)) === 2.0:2.0:2.0
+
     @test RH.binwalls(1:4) == [0.5, 1.5, 2.5, 3.5, 4.5]
     @test RH.binwalls(1:4, first=false, last=true) == [1.5,2.5,3.5, 4.5]
     @test RH.bincenters(1:2:9) == [2,4,6,8]
